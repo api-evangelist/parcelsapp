@@ -1,0 +1,69 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: Parcels App
+providerId: parcelsapp
+created: '2026-07-11'
+modified: '2026-07-11'
+reconciled: false
+tags:
+- Parcel Tracking
+- Shipment Status
+- Package Tracking
+- Rate Limiting
+- Quotas
+description: >-
+  Parcels App does not publish numeric per-second or per-minute request rate
+  limits for the Parcels API v3. The operative limit is the monthly quota of
+  unique tracking numbers (shipments) attached to your plan - 300, 500, or
+  1,000 per month on the published tiers - which GET /account reports as
+  plan, limit, current, and resetDate. Because tracking is asynchronous, the
+  documentation instructs clients to poll GET /shipments/tracking "every few
+  seconds" by UUID until done is true, or to avoid polling entirely by
+  supplying a webhookUrl. Repeated requests for an already-tracked number are
+  served from cache and do not consume additional unique-shipment quota; only
+  new unique tracking numbers count toward the monthly limit.
+notes: >-
+  No documented 429 behavior or Retry-After semantics were found as of the
+  review date; business errors (MISSING_API_KEY, INVALID_API_KEY,
+  MISSING_UUID, NO_REQUEST_FOUND, UNCONFIRMED_ACCOUNT, INVALID_WEBHOOK_URL)
+  are returned as JSON with an error field on HTTP 200. Treat the polling
+  cadence guidance and the monthly unique-shipment quota as the effective
+  limits, and verify current plan usage via GET /account.
+sources:
+- https://parcelsapp.com/api-docs/
+- https://parcelsapp.com/api-docs/openapi.json
+- https://parcelsapp.com/pricing-api
+responseCodes:
+  throttled: not documented (business errors returned as JSON error fields)
+limits:
+- name: API Request Rate
+  scope: account
+  metric: requests
+  limit: not published
+  notes: No fixed numeric request-per-second or per-minute limit is documented.
+- name: Unique Tracking Numbers
+  scope: account
+  metric: shipments
+  limit: per plan (300 / 500 / 1000 per month on published tiers)
+  notes: Each distinct tracking number added counts once toward the monthly plan limit; the counter and resetDate are exposed via GET /account.
+- name: Polling Cadence
+  scope: tracking request
+  metric: requests
+  limit: guidance - poll every few seconds
+  notes: Documentation says to poll GET /shipments/tracking by UUID every few seconds until done is true, or use webhooks instead.
+- name: Tracking Request Batch Size
+  scope: request
+  metric: shipments
+  limit: not published
+  notes: POST /shipments/tracking accepts an array of shipments (minItems 1); no documented maximum batch size.
+policies:
+- name: Cached Results
+  description: Already-tracked shipments are returned immediately from cache (fromCache true), reducing both polling and quota pressure for repeat lookups.
+- name: Webhooks Over Polling
+  description: Supplying a webhookUrl shifts delivery to shipment_completed and batch_completed callbacks, eliminating the polling loop; failed webhook deliveries (timeouts, 4xx/5xx) may be retried.
+- name: Backoff Strategy
+  description: Clients should keep the documented few-second polling cadence, back off on pending (done false) responses, and stop polling a UUID once done is true or NO_REQUEST_FOUND is returned.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

@@ -1,0 +1,95 @@
+specification: FinOps Framework
+specificationVersion: '1.0'
+schema: https://www.finops.org/framework/
+provider: Parcels App
+providerId: parcelsapp
+created: '2026-07-11'
+modified: '2026-07-11'
+reconciled: true
+tags:
+- Parcel Tracking
+- Shipment Status
+- Package Tracking
+- Logistics
+- FinOps
+- Cost Management
+- FOCUS
+description: >-
+  FinOps view of Parcels API spend. The API is billed as a flat monthly
+  subscription selected by tier - Pro 300 at $19, Premium 500 at $29, or Elite
+  1000 at $49 per month - rather than per-call pricing. The consumed unit is
+  the unique tracking number: each distinct tracking number added in a billing
+  month counts once against the plan limit, regardless of how many times its
+  status is polled, and the counter resets each cycle. Cargo and freight
+  tracking (air AWB, road LTL/FTL, sea container/BL) is included on the $19
+  and $29 tiers but excluded from the $49 postal-and-courier tier, so tier
+  choice is a capability decision as well as a volume decision. Paid plans
+  carry a 30-day no-questions-asked refund, and a pro-rated current-month
+  refund is issued automatically on termination.
+notes: >-
+  Spend is predictable (flat monthly) until shipment volume forces a tier
+  change; there is no published overage rate, so exceeding a limit means
+  upgrading tiers. Monitor consumption programmatically via GET /account
+  (plan, limit, current, resetDate). Prices confirmed on the API pricing page
+  as of 2026-07-11.
+sources:
+- https://parcelsapp.com/pricing-api
+- https://parcelsapp.com/terms-api
+- https://parcelsapp.com/api-docs/
+- https://focus.finops.org/focus-specification/v1-3/
+alignedWith:
+  framework: FinOps Foundation Framework
+  frameworkUrl: https://www.finops.org/framework/
+  dataSpec: FOCUS
+  dataSpecVersion: '1.3'
+  dataSpecUrl: https://focus.finops.org/focus-specification/v1-3/
+publisherName: Parcels App
+serviceCategory: Integration
+billingModel:
+  pricingCategory: Committed (flat monthly tiers)
+  billingFrequency: Monthly
+  billingCurrency: USD
+  chargeCategories:
+  - Purchase
+  - Adjustment
+focusColumns:
+  ServiceName: Parcels API
+  ServiceCategory: Integration
+  ProviderName: Parcels App
+  PublisherName: Parcels App
+  InvoiceIssuerName: Parcels App
+  BillingCurrency: USD
+  ChargeCategory: Purchase
+  PricingCategory: Committed
+meters:
+- name: unique_tracking_numbers
+  description: Distinct tracking numbers added per billing month; the sole metered unit, capped at 300/500/1000 by tier with the counter reset each cycle.
+  unit: shipments
+  aggregation: sum
+  dimensions:
+  - account
+  - plan
+- name: tracking_requests
+  description: POST/GET calls to /shipments/tracking; not billed directly, and repeat lookups of known numbers are served from cache without consuming quota.
+  unit: requests
+  aggregation: sum
+  dimensions:
+  - account
+- name: webhook_deliveries
+  description: shipment_completed and batch_completed callbacks delivered to your webhookUrl; no published per-delivery charge.
+  unit: events
+  aggregation: sum
+  dimensions:
+  - account
+principles:
+- name: Visibility
+  description: Poll GET /account for plan, limit, current, and resetDate to watch quota burn-down in dashboards before the monthly reset.
+- name: Allocation
+  description: A single flat subscription covers the account; allocate cost internally by tagging which orders/teams generate the unique tracking numbers submitted.
+- name: Optimization
+  description: Deduplicate tracking numbers before submitting (only unique numbers consume quota), lean on cached results and webhooks instead of polling loops, and drop to the $49 postal-and-courier tier only if cargo/freight tracking is not needed.
+- name: Accountability
+  description: Right-size the tier each month against actual unique-shipment volume; there is no overage pricing, so sustained overshoot means a planned upgrade rather than surprise usage charges.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

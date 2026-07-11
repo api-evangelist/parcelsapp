@@ -1,0 +1,99 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Parcels App Tracking API",
+    "version": "3.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Account",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Check account usage.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://parcelsapp.com/api/v3/account?apiKey={{apiKey}}",
+            "params": [
+              {
+                "name": "apiKey",
+                "value": "{{apiKey}}",
+                "type": "query",
+                "description": "API key from the Parcels dashboard."
+              }
+            ]
+          },
+          "docs": "Returns the current subscription plan, monthly unique shipment limit, usage counter, and the UTC date the counter resets."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Tracking",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create tracking request.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://parcelsapp.com/api/v3/shipments/tracking",
+            "body": {
+              "type": "json",
+              "data": "{\"apiKey\":\"{{apiKey}}\",\"language\":\"en\",\"shipments\":[{\"trackingId\":\"9400111206213785678901\",\"destinationCountry\":\"United States\"}]}"
+            }
+          },
+          "docs": "Creates an asynchronous tracking request. The response usually contains a temporary uuid to poll with; if every requested shipment is already cached the response is complete immediately (done true, fromCache true) with no uuid. Carriers are auto-detected across 1,540 postal, courier, and freight carriers."
+        },
+        {
+          "info": {
+            "name": "Create tracking request with webhook.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://parcelsapp.com/api/v3/shipments/tracking",
+            "body": {
+              "type": "json",
+              "data": "{\"apiKey\":\"{{apiKey}}\",\"language\":\"en\",\"webhookUrl\":\"https://example.com/parcels-webhook\",\"shipments\":[{\"trackingId\":\"9400111206213785678901\",\"destinationCountry\":\"United States\"}]}"
+            }
+          },
+          "docs": "Creates a tracking request that delivers results by webhook instead of polling. Parcels POSTs JSON WebhookPayload events (shipment_completed per shipment, then batch_completed) to the HTTPS webhookUrl; failed deliveries may be retried."
+        },
+        {
+          "info": {
+            "name": "Read tracking results.",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://parcelsapp.com/api/v3/shipments/tracking?uuid={{uuid}}&apiKey={{apiKey}}",
+            "params": [
+              {
+                "name": "uuid",
+                "value": "{{uuid}}",
+                "type": "query",
+                "description": "Temporary tracking request UUID returned by create tracking request. Do not pass a tracking number here."
+              },
+              {
+                "name": "apiKey",
+                "value": "{{apiKey}}",
+                "type": "query",
+                "description": "API key from the Parcels dashboard."
+              }
+            ]
+          },
+          "docs": "Polls a tracking request by UUID. Keep polling every few seconds until done is true; completed shipments include status, origin/destination, detected carrier, and the full timeline of tracking events."
+        }
+      ]
+    }
+  ]
+}

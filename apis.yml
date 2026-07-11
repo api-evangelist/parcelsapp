@@ -1,0 +1,87 @@
+aid: parcelsapp
+url: https://raw.githubusercontent.com/api-evangelist/parcelsapp/refs/heads/main/apis.yml
+name: Parcels App
+kind: company
+description: Parcels App (parcelsapp.com) is a universal parcel tracking service that
+  tracks packages, air cargo (AWB), road freight (LTL/FTL), and sea freight across
+  1,540 postal operators, couriers, and logistics carriers worldwide - USPS, UPS,
+  FedEx, DHL, Royal Mail, China Post, Cainiao, 4PX, and many more. The Parcels API
+  v3 is an asynchronous shipment tracking API - create a tracking request, then
+  poll by UUID or receive webhook callbacks until results are complete - with
+  automatic carrier detection, localized tracking events, and cached results
+  returned immediately.
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+tags:
+- Parcel Tracking
+- Shipment Status
+- Package Tracking
+- Logistics
+- Shipping
+- Carriers
+created: '2026-07-11'
+modified: '2026-07-11'
+specificationVersion: '0.19'
+apis:
+- aid: parcelsapp:parcelsapp-shipments-tracking-api
+  name: Parcels App Shipments Tracking API
+  tags:
+  - Parcel Tracking
+  - Shipment Status
+  - Package Tracking
+  - Webhooks
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://parcelsapp.com/api-docs/
+  baseURL: https://parcelsapp.com/api/v3
+  properties:
+  - url: https://parcelsapp.com/api-docs/
+    type: Documentation
+  - url: https://parcelsapp.com/api-docs/openapi.json
+    type: APIReference
+  - url: openapi/parcelsapp-openapi.yml
+    type: OpenAPI
+  description: Asynchronous multi-carrier shipment tracking. POST /shipments/tracking
+    creates a tracking request for one or more tracking numbers (with automatic
+    carrier detection across 1,540 carriers), returning a UUID and any cached
+    results immediately; GET /shipments/tracking polls by UUID until done is true.
+    Optionally pass a webhookUrl to receive shipment_completed and batch_completed
+    JSON callbacks instead of polling. Returns shipment status, origin/destination,
+    detected carrier, and a full timeline of tracking events.
+- aid: parcelsapp:parcelsapp-account-usage-api
+  name: Parcels App Account Usage API
+  tags:
+  - Account
+  - Usage
+  - Quotas
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  humanURL: https://parcelsapp.com/api-docs/
+  baseURL: https://parcelsapp.com/api/v3
+  properties:
+  - url: https://parcelsapp.com/api-docs/
+    type: Documentation
+  - url: openapi/parcelsapp-openapi.yml
+    type: OpenAPI
+  description: GET /account returns the current subscription plan, monthly unique
+    shipment limit, usage counter, and the UTC date the counter resets - letting
+    integrations meter their tracking quota before creating new requests.
+common:
+- type: Website
+  url: https://parcelsapp.com
+- type: Documentation
+  url: https://parcelsapp.com/api-docs/
+- type: Portal
+  url: https://parcelsapp.com/dashboard/
+- type: Pricing
+  url: https://parcelsapp.com/pricing-api
+- type: TermsOfService
+  url: https://parcelsapp.com/terms-api
+- type: Blog
+  url: https://parcelsapp.com/blog
+- type: Plans
+  url: plans/parcelsapp-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/parcelsapp-rate-limits.yml
+- type: FinOps
+  url: finops/parcelsapp-finops.yml
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

@@ -1,0 +1,139 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: Parcels App
+providerId: parcelsapp
+created: '2026-07-11'
+modified: '2026-07-11'
+reconciled: true
+tags:
+- Parcel Tracking
+- Shipment Status
+- Package Tracking
+- Logistics
+- Plans
+description: >-
+  The Parcels API is sold as flat monthly subscriptions metered by unique
+  tracking numbers (shipments) added per month - each distinct tracking number
+  counts once toward the monthly limit, which resets each billing cycle. Three
+  tiers are published on the API pricing page: Pro 300 ($19/month), Premium 500
+  ($29/month), and Elite 1000 ($49/month, postal and courier tracking only -
+  cargo and freight excluded). The two lower tiers include air cargo (AWB),
+  road freight (LTL/FTL), and sea freight (container/BL) tracking alongside
+  postal and courier tracking across 1,540 carriers. All tiers include same-day
+  email support. API keys are issued free from the Parcels dashboard, and the
+  documentation publishes a keyless mock server for trying the API; the exact
+  free-usage allowance before a paid plan is required is not published on the
+  pricing page. Paid plans carry a 30-day no-questions-asked refund.
+notes: >-
+  Prices confirmed on https://parcelsapp.com/pricing-api as of 2026-07-11. The
+  API terms prohibit building a competing tracking website or app, transferring
+  your API key to third parties, or registering multiple free accounts - the
+  latter implying a free account tier whose numeric shipment allowance is not
+  published; treat any specific free-tier number as unconfirmed. A separate
+  consumer product, Parcels Pro (app subscriptions from $3.99 to $19.99/month),
+  is not the API and is out of scope here.
+sources:
+- https://parcelsapp.com/pricing-api
+- https://parcelsapp.com/terms-api
+- https://parcelsapp.com/api-docs/
+plans:
+- id: parcelsapp-free-api-key
+  name: Free API Key
+  type: free
+  description: >-
+    API keys are issued free from the Parcels dashboard, and a keyless mock
+    server in the documentation lets you exercise the full create-then-poll
+    flow without an account. The numeric free-usage shipment allowance (if
+    any) before a paid subscription is required is not published on the
+    pricing page.
+  entries:
+  - label: Free Usage Allowance
+    name: free_shipments
+    type: usage
+    metric: shipments
+    limit: -1
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: free (allowance not published; mock server is unlimited and keyless)
+    userMultiplied: false
+  elements:
+  - name: Dashboard API Key
+  - name: Keyless Mock Server
+- id: parcelsapp-pro-300
+  name: Pro 300
+  type: paid
+  description: >-
+    Track up to 300 unique tracking numbers per month across 1,540 carriers,
+    including air cargo by AWB, road freight (LTL/FTL), and sea freight by
+    container or B/L. Same-day support by email.
+  entries:
+  - label: Unique Tracking Numbers
+    name: pro_300_shipments
+    type: usage
+    metric: shipments
+    limit: 300
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: $19 per month flat
+    userMultiplied: false
+  elements:
+  - name: 1,540 Carriers
+  - name: Air Cargo (AWB) Tracking
+  - name: Road Freight (LTL/FTL) Tracking
+  - name: Sea Freight (Container/BL) Tracking
+  - name: Webhook Callbacks
+  - name: Same-Day Email Support
+- id: parcelsapp-premium-500
+  name: Premium 500
+  type: paid
+  description: >-
+    Track up to 500 unique tracking numbers per month across 1,540 carriers,
+    including air cargo by AWB, road freight (LTL/FTL), and sea freight by
+    container or B/L. Same-day support by email.
+  entries:
+  - label: Unique Tracking Numbers
+    name: premium_500_shipments
+    type: usage
+    metric: shipments
+    limit: 500
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: $29 per month flat
+    userMultiplied: false
+  elements:
+  - name: 1,540 Carriers
+  - name: Air Cargo (AWB) Tracking
+  - name: Road Freight (LTL/FTL) Tracking
+  - name: Sea Freight (Container/BL) Tracking
+  - name: Webhook Callbacks
+  - name: Same-Day Email Support
+- id: parcelsapp-elite-1000
+  name: Elite 1000 (Postal and Courier)
+  type: paid
+  description: >-
+    Track up to 1,000 unique tracking numbers per month across 1,540 carriers.
+    Postal and courier tracking only - cargo and freight tracking (air, road,
+    sea) is not included on this tier. Same-day support by email.
+  entries:
+  - label: Unique Tracking Numbers
+    name: elite_1000_shipments
+    type: usage
+    metric: shipments
+    limit: 1000
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: $49 per month flat
+    userMultiplied: false
+  elements:
+  - name: 1,540 Carriers
+  - name: Postal and Courier Tracking Only
+  - name: Webhook Callbacks
+  - name: Same-Day Email Support
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

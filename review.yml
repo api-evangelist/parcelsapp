@@ -1,0 +1,74 @@
+aid: parcelsapp
+name: Parcels App
+review:
+  question: Does Parcels App expose a documented public WebSocket API?
+  answer: false
+  date: '2026-07-11'
+  reviewer: API Evangelist
+  asyncapiSpecCreated: false
+  asyncapiScopeNote: |
+    No AsyncAPI document was authored. The Parcels API v3 is request/response
+    REST over HTTPS with an asynchronous create-then-poll pattern plus optional
+    outbound webhook callbacks (Parcels POSTs JSON WebhookPayload events to a
+    customer-hosted webhookUrl). There is no server-push transport (WebSocket
+    or SSE) on Parcels App's own API to model; the webhook receiver is an
+    endpoint the consumer hosts, consistent with prior scope decisions
+    (sequin-io) not to model provider-to-endpoint webhook HTTP as AsyncAPI.
+findings:
+  summary: |
+    Parcels App does not publish a documented public WebSocket API. The
+    Parcels API v3 (base https://parcelsapp.com/api/v3) is a REST API
+    authenticated with an apiKey issued from the Parcels dashboard. Tracking
+    is explicitly asynchronous over plain HTTPS: POST /shipments/tracking
+    creates a tracking request and returns a temporary uuid (and any cached
+    shipment results immediately); clients then poll GET /shipments/tracking
+    every few seconds by uuid until done is true, or supply a webhookUrl to
+    receive shipment_completed and batch_completed JSON callbacks by HTTP
+    POST. No realtime, bidirectional, or streaming WebSocket (ws:// or wss://)
+    endpoint appears anywhere in the interactive API documentation, the
+    published OpenAPI 3.0.3 contract, or the API pricing page as of the
+    review date.
+  transports:
+    - protocol: REST
+      scheme: https
+      baseURL: https://parcelsapp.com/api/v3
+      documented: true
+      note: Live API server declared in the published OpenAPI contract; a keyless mock server (/api-docs/mock/v3) is also documented for trying the flow.
+    - protocol: HTTP Polling
+      scheme: https
+      documented: true
+      note: GET /shipments/tracking polled by uuid every few seconds until done is true. Client-initiated polling, not server push.
+    - protocol: Webhook
+      scheme: https
+      documented: true
+      note: Optional webhookUrl on POST /shipments/tracking; Parcels POSTs JSON WebhookPayload events (shipment_completed, batch_completed) to the customer-hosted HTTPS endpoint, with retries on failure. Server-to-endpoint HTTP, not WebSocket.
+    - protocol: WebSocket
+      scheme: wss
+      documented: false
+      note: No WebSocket endpoint is documented in the API reference, the OpenAPI contract, or anywhere else on parcelsapp.com as of the review date.
+  endpointsConfirmedRest:
+    - GET  https://parcelsapp.com/api/v3/account
+    - POST https://parcelsapp.com/api/v3/shipments/tracking
+    - GET  https://parcelsapp.com/api/v3/shipments/tracking
+sources:
+  - url: https://parcelsapp.com/api-docs/
+    type: Documentation
+    note: Interactive API reference; describes the asynchronous create-then-poll tracking flow. No WebSocket mentioned.
+  - url: https://parcelsapp.com/api-docs/openapi.json
+    type: APIReference
+    note: Published OpenAPI 3.0.3 contract; servers are HTTPS only (live /api/v3 plus a mock), paths are /account and /shipments/tracking, plus a documented customer-hosted /parcels-webhook receiver. Zero WebSocket/wss references.
+  - url: https://parcelsapp.com/pricing-api
+    type: Plans
+    note: API pricing page (Pro 300 $19, Premium 500 $29, Elite 1000 $49 per month); no realtime/WebSocket product surface.
+  - url: https://parcelsapp.com/terms-api
+    type: TermsOfService
+    note: API Terms of Use; monthly billing, 30-day refund, no streaming transport described.
+actions:
+  asyncapiPath: null
+  apisYmlUpdated: true
+  reason: |
+    No WebSocket protocol surface exists. Parcels App's own public API is
+    request/response REST with client polling; asynchronous delivery is
+    available only as outbound webhooks to a customer-hosted HTTPS endpoint,
+    which is out of scope for an AsyncAPI document per prior review scope
+    decisions. No AsyncAPI document was created.
