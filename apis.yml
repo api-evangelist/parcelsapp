@@ -64,6 +64,8 @@ apis:
     shipment limit, usage counter, and the UTC date the counter resets - letting
     integrations meter their tracking quota before creating new requests.
 common:
+- type: AgenticAccess
+  url: agentic-access/parcelsapp-agentic-access.yml
 - type: DomainSecurity
   url: security/parcelsapp-domain-security.yml
 - type: Website
