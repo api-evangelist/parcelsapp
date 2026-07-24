@@ -1,0 +1,298 @@
+openapi: 3.0.3
+info:
+  title: Parcels Account Webhooks API
+  version: 1.0.0
+  description: 'Track packages and shipments worldwide through the Parcels API. Tracking is asynchronous: create a tracking request, then poll by UUID until the result is complete. Use the Mock API server in this documentation to try the flow without an API key or account limits.'
+  contact:
+    name: Parcels
+    url: https://parcelsapp.com
+    email: hello@parcelsapp.com
+servers:
+- url: https://parcelsapp.com/api/v3
+  description: Live API
+tags:
+- name: Webhooks
+  description: Callbacks sent to your `webhookUrl` when tracking progresses or completes. Pass `webhookUrl` in `POST /shipments/tracking`; Parcels sends JSON `POST` requests to that URL.
+paths:
+  /parcels-webhook:
+    post:
+      operationId: receiveTrackingWebhook
+      summary: Receive tracking webhook
+      description: 'This is the endpoint that you host, not a Parcels API endpoint. Provide its URL as `webhookUrl` when creating a tracking request.
+
+
+        Parcels sends `POST` requests with `Content-Type: application/json`. Return any 2xx response quickly after accepting the payload. Network errors, timeouts, and HTTP 4xx/5xx responses are treated as failed deliveries and may be retried.
+
+
+        Typical flow: create tracking with `webhookUrl`, save the returned `uuid`, then match incoming webhook events by `uuid`. For batches, expect zero or more `shipment_completed` events followed by one `batch_completed` event when all non-cached shipments finish. If the create response included cached shipments, keep those from the create response; webhook payloads cover the newly tracked remainder.'
+      tags:
+      - Webhooks
+      servers:
+      - url: https://example.com
+        description: Your application server
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookPayload'
+            examples:
+              shipmentCompleted:
+                summary: Single shipment completed
+                value:
+                  event: shipment_completed
+                  uuid: demo_mixed_cache
+                  timestamp: '2026-07-07T06:45:00.000Z'
+                  done: false
+                  shipment:
+                    trackingId: '9400111206213785678901'
+                    status: delivered
+                    origin: United States
+                    destination: United States
+                    originCode: US
+                    destinationCode: US
+                    states:
+                    - state: Delivered, In/At Mailbox
+                      location: Austin, TX, United States
+                      date: '2026-06-25T18:42:00.000Z'
+                      carrier: 0
+                    - state: Arrived at Post Office
+                      location: Austin, TX, United States
+                      date: '2026-06-25T13:17:00.000Z'
+                      carrier: 0
+                    services:
+                    - slug: usps
+                      name: USPS
+                    detectedCarrier:
+                      slug: usps
+                      name: USPS
+              batchCompleted:
+                summary: Batch completed
+                value:
+                  event: batch_completed
+                  uuid: demo_mixed_cache
+                  timestamp: '2026-07-07T06:46:10.000Z'
+                  done: true
+                  shipments:
+                  - trackingId: '9400111206213785678901'
+                    status: delivered
+                    origin: United States
+                    destination: United States
+                    originCode: US
+                    destinationCode: US
+                    states:
+                    - state: Delivered, In/At Mailbox
+                      location: Austin, TX, United States
+                      date: '2026-06-25T18:42:00.000Z'
+                      carrier: 0
+                    - state: Arrived at Post Office
+                      location: Austin, TX, United States
+                      date: '2026-06-25T13:17:00.000Z'
+                      carrier: 0
+                    services:
+                    - slug: usps
+                      name: USPS
+                    detectedCarrier:
+                      slug: usps
+                      name: USPS
+              trackingError:
+                summary: Tracking workflow error
+                value:
+                  event: tracking_error
+                  uuid: demo_mixed_cache
+                  timestamp: '2026-07-07T06:46:10.000Z'
+                  done: true
+                  error: TRACKING_ERROR
+                  message: Failed to save tracking result for 9400111206213785678901
+      responses:
+        '200':
+          description: Return any 2xx status after accepting the webhook payload. The response body is ignored.
+      x-codeSamples:
+      - lang: JavaScript
+        label: Express
+        source: "app.post('/parcels-webhook', express.json(), (req, res) => {\n  const event = req.body;\n\n  if (event.event === 'shipment_completed') {\n    console.log('Shipment finished', event.uuid, event.shipment.trackingId);\n  }\n\n  if (event.event === 'batch_completed') {\n    console.log('Batch finished', event.uuid, event.shipments.length);\n  }\n\n  res.sendStatus(204);\n});"
+      - lang: Python
+        label: Flask
+        source: "from flask import Flask, request\n\napp = Flask(__name__)\n\n@app.post('/parcels-webhook')\ndef parcels_webhook():\n    event = request.get_json()\n    if event['event'] == 'shipment_completed':\n        print('Shipment finished', event['uuid'], event['shipment']['trackingId'])\n    if event['event'] == 'batch_completed':\n        print('Batch finished', event['uuid'], len(event.get('shipments', [])))\n    return ('', 204)"
+      - lang: PHP
+        label: PHP
+        source: "<?php\n$event = json_decode(file_get_contents('php://input'), true);\n\nif ($event['event'] === 'shipment_completed') {\n  error_log('Shipment finished ' . $event['uuid'] . ' ' . $event['shipment']['trackingId']);\n}\n\nif ($event['event'] === 'batch_completed') {\n  error_log('Batch finished ' . $event['uuid'] . ' ' . count($event['shipments'] ?? []));\n}\n\nhttp_response_code(204);\n?>"
+components:
+  schemas:
+    Attribute:
+      type: object
+      properties:
+        l:
+          type: string
+          description: Attribute label.
+          example: origin
+        n:
+          type: string
+          description: Optional display name.
+          example: Weight
+        val:
+          type: string
+          description: Attribute value.
+          example: United States
+        code:
+          type: string
+          description: Optional code value.
+          example: US
+    Carrier:
+      type: object
+      properties:
+        slug:
+          type: string
+          description: Carrier identifier.
+          example: usps
+        name:
+          type: string
+          description: Carrier display name.
+          example: USPS
+    Shipment:
+      type: object
+      properties:
+        trackingId:
+          type: string
+          description: Tracking number.
+          example: '9400111206213785678901'
+        status:
+          type: string
+          description: Current normalized shipment status.
+          enum:
+          - transit
+          - arrived
+          - pickup
+          - delivered
+          - returned
+          - archive
+          example: delivered
+        origin:
+          type: string
+          description: Localized origin country.
+          example: United States
+        destination:
+          type: string
+          description: Localized destination country.
+          example: United States
+        originCode:
+          type: string
+          description: Two-letter origin country code.
+          example: US
+        destinationCode:
+          type: string
+          description: Two-letter destination country code.
+          example: US
+        states:
+          type: array
+          description: Tracking events in reverse chronological order.
+          items:
+            $ref: '#/components/schemas/Event'
+        services:
+          type: array
+          description: Carriers queried for this tracking number.
+          items:
+            $ref: '#/components/schemas/Carrier'
+        detectedCarrier:
+          $ref: '#/components/schemas/Carrier'
+        detected:
+          type: array
+          description: Indexes into `services` where tracking events were found.
+          items:
+            type: integer
+        attributes:
+          type: array
+          description: Additional carrier metadata such as origin, destination, weight, or references.
+          items:
+            $ref: '#/components/schemas/Attribute'
+        externalTracking:
+          type: array
+          description: Direct carrier tracking links.
+          items:
+            $ref: '#/components/schemas/OutgoingLink'
+    OutgoingLink:
+      type: object
+      properties:
+        slug:
+          type: string
+          example: usps
+        url:
+          type: string
+          format: uri
+          example: https://tools.usps.com/go/TrackConfirmAction?tLabels=9400111206213785678901
+        trackingId:
+          type: string
+          example: '9400111206213785678901'
+        method:
+          type: string
+          enum:
+          - GET
+          - POST
+          example: GET
+    Event:
+      type: object
+      properties:
+        state:
+          type: string
+          description: Human-readable tracking event text.
+          example: Delivered, In/At Mailbox
+        location:
+          type: string
+          description: Event location.
+          example: Austin, TX, United States
+        date:
+          type: string
+          format: date-time
+          description: UTC event timestamp.
+          example: '2026-06-25T18:42:00.000Z'
+        carrier:
+          type: integer
+          description: Index of the reporting carrier in the `services` array.
+          example: 0
+    WebhookPayload:
+      type: object
+      description: JSON body Parcels sends to the `webhookUrl` from `POST /shipments/tracking`. A `shipment_completed` event contains `shipment`; a `batch_completed` event contains `shipments`; a `tracking_error` event contains `error` and `message`.
+      properties:
+        event:
+          type: string
+          enum:
+          - shipment_completed
+          - batch_completed
+          - tracking_error
+          example: batch_completed
+          description: Webhook event type. `shipment_completed` means one newly tracked shipment finished. `batch_completed` means all newly tracked, non-cached shipments for the UUID finished.
+        uuid:
+          type: string
+          example: demo_usps_delivered
+          description: Tracking request UUID returned by `POST /shipments/tracking`.
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-06-25T18:43:00.000Z'
+        done:
+          type: boolean
+          example: true
+          description: '`true` when the whole tracking request is complete. Individual shipment events usually have `done: false`; the final batch event has `done: true`.'
+        shipment:
+          allOf:
+          - $ref: '#/components/schemas/Shipment'
+          description: 'Present on `shipment_completed`: the finished newly tracked shipment result.'
+        shipments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shipment'
+          description: 'Present on `batch_completed`: finished results for the newly tracked, non-cached shipments in this UUID. Cached shipments, if any, were already returned in the create response.'
+        error:
+          type: string
+          example: TRACKING_ERROR
+          description: 'Present on `tracking_error`: stable error type.'
+        message:
+          type: string
+          example: Failed to save tracking result
+          description: 'Present on `tracking_error`: human-readable error details.'
+x-tagGroups:
+- name: Guide
+  tags:
+  - Account
+  - Tracking
+  - Webhooks

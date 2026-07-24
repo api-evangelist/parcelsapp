@@ -1,0 +1,160 @@
+openapi: 3.0.3
+info:
+  title: Parcels Account API
+  version: 1.0.0
+  description: 'Track packages and shipments worldwide through the Parcels API. Tracking is asynchronous: create a tracking request, then poll by UUID until the result is complete. Use the Mock API server in this documentation to try the flow without an API key or account limits.'
+  contact:
+    name: Parcels
+    url: https://parcelsapp.com
+    email: hello@parcelsapp.com
+servers:
+- url: https://parcelsapp.com/api/v3
+  description: Live API
+tags:
+- name: Account
+  description: Subscription usage and account limits
+paths:
+  /account:
+    get:
+      operationId: getAccountUsage
+      summary: Check account usage
+      description: Returns the current subscription plan, shipment limit, usage counter, and reset date. On the Mock API server this endpoint returns a fixed demo account and does not require `apiKey`.
+      tags:
+      - Account
+      parameters:
+      - name: apiKey
+        in: query
+        required: true
+        description: API key from the Parcels dashboard. Not required on the Mock API server.
+        schema:
+          type: string
+          example: pk_live_your_api_key
+      responses:
+        '200':
+          description: Account information or API error.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/AccountInfo'
+                - $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                success:
+                  summary: Account usage
+                  value:
+                    plan: Pro
+                    limit: 3000
+                    current: 142
+                    resetDate: '2026-08-01T00:00:00.000Z'
+                missingApiKey:
+                  summary: Missing API key
+                  value:
+                    error: MISSING_API_KEY
+                    description: No .apiKey found
+                invalidApiKey:
+                  summary: Invalid API key
+                  value:
+                    error: INVALID_API_KEY
+      x-codeSamples:
+      - lang: curl
+        label: cURL
+        source: curl "https://parcelsapp.com/api/v3/account?apiKey=<YOUR_API_KEY>"
+      - lang: JavaScript
+        label: JavaScript
+        source: 'const response = await fetch(''https://parcelsapp.com/api/v3/account?apiKey='' + encodeURIComponent(apiKey));
+
+          console.log(await response.json());'
+      - lang: Python
+        label: Python
+        source: 'import requests
+
+
+          response = requests.get(''https://parcelsapp.com/api/v3/account'', params={''apiKey'': api_key})
+
+          print(response.json())'
+      - lang: PHP
+        label: PHP
+        source: '<?php
+
+          $response = file_get_contents(''https://parcelsapp.com/api/v3/account?apiKey='' . urlencode($apiKey));
+
+          print_r(json_decode($response, true));
+
+          ?>'
+components:
+  schemas:
+    AccountInfo:
+      type: object
+      required:
+      - plan
+      - limit
+      - current
+      - resetDate
+      properties:
+        plan:
+          type: string
+          description: Current subscription plan name.
+          example: Pro
+        limit:
+          type: integer
+          description: Shipment limit for the current period.
+          example: 3000
+        current:
+          type: integer
+          description: Shipments already used in the current period.
+          example: 142
+        resetDate:
+          type: string
+          format: date-time
+          description: UTC date when the usage counter resets.
+          example: '2026-08-01T00:00:00.000Z'
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          description: Stable error code.
+          enum:
+          - MISSING_API_KEY
+          - INVALID_API_KEY
+          - UNCONFIRMED_ACCOUNT
+          - SUBSCRIPTION_NOT_FOUND
+          - SUBSCRIPTION_INACTIVE
+          - SUBSCRIPTION_LIMIT_REACHED
+          - INVALID_SUBSCRIPTION_STATE
+          - INVALID_PARAMS
+          - NO_SHIPMENTS
+          - BUSY
+          - INVALID_WEBHOOK_URL
+          - MISSING_UUID
+          - TIMEDOUT
+          - NO_REQUEST_FOUND
+          - SERVER_ERROR
+          - FORBIDDEN
+          example: INVALID_API_KEY
+        description:
+          type: string
+          description: Human-readable error details when available.
+          example: No .apiKey found
+        uuid:
+          type: string
+          description: Tracking request UUID, when relevant.
+          example: demo_usps_delivered
+        confirmationUrl:
+          type: string
+          format: uri
+          description: One-time account confirmation URL returned with `UNCONFIRMED_ACCOUNT`.
+          example: https://parcelsapp.com/api/v3/account/confirm/user%40example.com/0123456789abcdef
+        confirmationExpiresAt:
+          type: string
+          format: date-time
+          description: Expiration time for `confirmationUrl`.
+          example: '2026-07-08T12:00:00.000Z'
+x-tagGroups:
+- name: Guide
+  tags:
+  - Account
+  - Tracking
+  - Webhooks
