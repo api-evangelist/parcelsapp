@@ -10,7 +10,19 @@ description: Parcels App (parcelsapp.com) is a universal parcel tracking service
   poll by UUID or receive webhook callbacks until results are complete - with
   automatic carrier detection, localized tracking events, and cached results
   returned immediately.
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+accessModel:
+  pricing: freemium
+  onboarding: unknown
+  trial: false
+  try_now: false
+  public: false
+  label: Freemium
+  confidence: medium
+  source:
+  - plans
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/parcelsapp.png
 tags:
 - Parcel Tracking
 - Shipment Status
@@ -22,47 +34,50 @@ created: '2026-07-11'
 modified: '2026-07-11'
 specificationVersion: '0.19'
 apis:
-- aid: parcelsapp:parcelsapp-shipments-tracking-api
-  name: Parcels App Shipments Tracking API
-  tags:
-  - Parcel Tracking
-  - Shipment Status
-  - Package Tracking
-  - Webhooks
-  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+- aid: parcelsapp:parcelsapp-account-api
+  name: Parcels App Account API
+  description: Subscription usage and account limits
   humanURL: https://parcelsapp.com/api-docs/
   baseURL: https://parcelsapp.com/api/v3
-  properties:
-  - url: https://parcelsapp.com/api-docs/
-    type: Documentation
-  - url: https://parcelsapp.com/api-docs/openapi.json
-    type: APIReference
-  - url: openapi/parcelsapp-openapi.yml
-    type: OpenAPI
-  description: Asynchronous multi-carrier shipment tracking. POST /shipments/tracking
-    creates a tracking request for one or more tracking numbers (with automatic
-    carrier detection across 1,540 carriers), returning a UUID and any cached
-    results immediately; GET /shipments/tracking polls by UUID until done is true.
-    Optionally pass a webhookUrl to receive shipment_completed and batch_completed
-    JSON callbacks instead of polling. Returns shipment status, origin/destination,
-    detected carrier, and a full timeline of tracking events.
-- aid: parcelsapp:parcelsapp-account-usage-api
-  name: Parcels App Account Usage API
   tags:
   - Account
-  - Usage
-  - Quotas
-  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+  properties:
+  - type: OpenAPI
+    url: openapi/parcelsapp-account-api-openapi.yml
+  - type: Documentation
+    url: https://parcelsapp.com/api-docs/
+  - type: APIReference
+    url: https://parcelsapp.com/api-docs/openapi.json
+- aid: parcelsapp:parcelsapp-tracking-api
+  name: Parcels App Tracking API
+  description: Create tracking requests and read results
   humanURL: https://parcelsapp.com/api-docs/
   baseURL: https://parcelsapp.com/api/v3
+  tags:
+  - Tracking
   properties:
-  - url: https://parcelsapp.com/api-docs/
-    type: Documentation
-  - url: openapi/parcelsapp-openapi.yml
-    type: OpenAPI
-  description: GET /account returns the current subscription plan, monthly unique
-    shipment limit, usage counter, and the UTC date the counter resets - letting
-    integrations meter their tracking quota before creating new requests.
+  - type: OpenAPI
+    url: openapi/parcelsapp-tracking-api-openapi.yml
+  - type: Documentation
+    url: https://parcelsapp.com/api-docs/
+  - type: APIReference
+    url: https://parcelsapp.com/api-docs/openapi.json
+- aid: parcelsapp:parcelsapp-webhooks-api
+  name: Parcels App Webhooks API
+  description: >-
+    Callbacks sent to your `webhookUrl` when tracking progresses or completes. Pass `webhookUrl` in `POST
+    /shipments/tracking`; Parcels sends JSON `POST` requests to that URL.
+  humanURL: https://parcelsapp.com/api-docs/
+  baseURL: https://parcelsapp.com/api/v3
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/parcelsapp-webhooks-api-openapi.yml
+  - type: Documentation
+    url: https://parcelsapp.com/api-docs/
+  - type: APIReference
+    url: https://parcelsapp.com/api-docs/openapi.json
 common:
 - type: AgenticAccess
   url: agentic-access/parcelsapp-agentic-access.yml
