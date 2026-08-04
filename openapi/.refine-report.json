@@ -1,0 +1,18 @@
+{
+  "provider": "parcelsapp",
+  "sources": [
+    "parcelsapp-account-api-openapi.yml",
+    "parcelsapp-tracking-api-openapi.yml",
+    "parcelsapp-webhooks-api-openapi.yml"
+  ],
+  "outputs": [
+    "parcelsapp-account-api-openapi.yml",
+    "parcelsapp-tracking-api-openapi.yml",
+    "parcelsapp-webhooks-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
