@@ -1,0 +1,117 @@
+{
+  "item": [
+    {
+      "id": "c0d40ad8-d471-41af-8a8c-e2d2c77c472d",
+      "name": "Webhooks",
+      "description": {
+        "content": "Callbacks sent to your `webhookUrl` when tracking progresses or completes. Pass `webhookUrl` in `POST /shipments/tracking`; Parcels sends JSON `POST` requests to that URL.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "49de7085-b6e3-488e-87bc-29d25ca2e7ce",
+          "name": "Receive tracking webhook",
+          "request": {
+            "name": "Receive tracking webhook",
+            "description": {
+              "content": "This is the endpoint that you host, not a Parcels API endpoint. Provide its URL as `webhookUrl` when creating a tracking request.\n\nParcels sends `POST` requests with `Content-Type: application/json`. Return any 2xx response quickly after accepting the payload. Network errors, timeouts, and HTTP 4xx/5xx responses are treated as failed deliveries and may be retried.\n\nTypical flow: create tracking with `webhookUrl`, save the returned `uuid`, then match incoming webhook events by `uuid`. For batches, expect zero or more `shipment_completed` events followed by one `batch_completed` event when all non-cached shipments finish. If the create response included cached shipments, keep those from the create response; webhook payloads cover the newly tracked remainder.",
+              "type": "text/plain"
+            },
+            "url": {
+              "protocol": "https",
+              "path": [
+                "parcels-webhook"
+              ],
+              "host": [
+                "example",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"<string>\",\n  \"uuid\": \"<string>\",\n  \"timestamp\": \"<dateTime>\",\n  \"done\": \"<boolean>\",\n  \"shipment\": {\n    \"trackingId\": \"<string>\",\n    \"status\": \"<string>\",\n    \"origin\": \"<string>\",\n    \"destination\": \"<string>\",\n    \"originCode\": \"<string>\",\n    \"destinationCode\": \"<string>\",\n    \"states\": [\n      {\n        \"state\": \"<string>\",\n        \"location\": \"<string>\",\n        \"date\": \"<dateTime>\",\n        \"carrier\": \"<integer>\"\n      },\n      {\n        \"state\": \"<string>\",\n        \"location\": \"<string>\",\n        \"date\": \"<dateTime>\",\n        \"carrier\": \"<integer>\"\n      }\n    ],\n    \"services\": [\n      {\n        \"slug\": \"<string>\",\n        \"name\": \"<string>\"\n      },\n      {\n        \"slug\": \"<string>\",\n        \"name\": \"<string>\"\n      }\n    ],\n    \"detectedCarrier\": {\n      \"slug\": \"<string>\",\n      \"name\": \"<string>\"\n    },\n    \"detected\": [\n      \"<integer>\",\n      \"<integer>\"\n    ],\n    \"attributes\": [\n      {\n        \"l\": \"<string>\",\n        \"n\": \"<string>\",\n        \"val\": \"<string>\",\n        \"code\": \"<string>\"\n      },\n      {\n        \"l\": \"<string>\",\n        \"n\": \"<string>\",\n        \"val\": \"<string>\",\n        \"code\": \"<string>\"\n      }\n    ],\n    \"externalTracking\": [\n      {\n        \"slug\": \"<string>\",\n        \"url\": \"<uri>\",\n        \"trackingId\": \"<string>\",\n        \"method\": \"<string>\"\n      },\n      {\n        \"slug\": \"<string>\",\n        \"url\": \"<uri>\",\n        \"trackingId\": \"<string>\",\n        \"method\": \"<string>\"\n      }\n    ]\n  },\n  \"shipments\": [\n    {\n      \"trackingId\": \"<string>\",\n      \"status\": \"<string>\",\n      \"origin\": \"<string>\",\n      \"destination\": \"<string>\",\n      \"originCode\": \"<string>\",\n      \"destinationCode\": \"<string>\",\n      \"states\": [\n        {\n          \"state\": \"<string>\",\n          \"location\": \"<string>\",\n          \"date\": \"<dateTime>\",\n          \"carrier\": \"<integer>\"\n        },\n        {\n          \"state\": \"<string>\",\n          \"location\": \"<string>\",\n          \"date\": \"<dateTime>\",\n          \"carrier\": \"<integer>\"\n        }\n      ],\n      \"services\": [\n        {\n          \"slug\": \"<string>\",\n          \"name\": \"<string>\"\n        },\n        {\n          \"slug\": \"<string>\",\n          \"name\": \"<string>\"\n        }\n      ],\n      \"detectedCarrier\": {\n        \"slug\": \"<string>\",\n        \"name\": \"<string>\"\n      },\n      \"detected\": [\n        \"<integer>\",\n        \"<integer>\"\n      ],\n      \"attributes\": [\n        {\n          \"l\": \"<string>\",\n          \"n\": \"<string>\",\n          \"val\": \"<string>\",\n          \"code\": \"<string>\"\n        },\n        {\n          \"l\": \"<string>\",\n          \"n\": \"<string>\",\n          \"val\": \"<string>\",\n          \"code\": \"<string>\"\n        }\n      ],\n      \"externalTracking\": [\n        {\n          \"slug\": \"<string>\",\n          \"url\": \"<uri>\",\n          \"trackingId\": \"<string>\",\n          \"method\": \"<string>\"\n        },\n        {\n          \"slug\": \"<string>\",\n          \"url\": \"<uri>\",\n          \"trackingId\": \"<string>\",\n          \"method\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"trackingId\": \"<string>\",\n      \"status\": \"<string>\",\n      \"origin\": \"<string>\",\n      \"destination\": \"<string>\",\n      \"originCode\": \"<string>\",\n      \"destinationCode\": \"<string>\",\n      \"states\": [\n        {\n          \"state\": \"<string>\",\n          \"location\": \"<string>\",\n          \"date\": \"<dateTime>\",\n          \"carrier\": \"<integer>\"\n        },\n        {\n          \"state\": \"<string>\",\n          \"location\": \"<string>\",\n          \"date\": \"<dateTime>\",\n          \"carrier\": \"<integer>\"\n        }\n      ],\n      \"services\": [\n        {\n          \"slug\": \"<string>\",\n          \"name\": \"<string>\"\n        },\n        {\n          \"slug\": \"<string>\",\n          \"name\": \"<string>\"\n        }\n      ],\n      \"detectedCarrier\": {\n        \"slug\": \"<string>\",\n        \"name\": \"<string>\"\n      },\n      \"detected\": [\n        \"<integer>\",\n        \"<integer>\"\n      ],\n      \"attributes\": [\n        {\n          \"l\": \"<string>\",\n          \"n\": \"<string>\",\n          \"val\": \"<string>\",\n          \"code\": \"<string>\"\n        },\n        {\n          \"l\": \"<string>\",\n          \"n\": \"<string>\",\n          \"val\": \"<string>\",\n          \"code\": \"<string>\"\n        }\n      ],\n      \"externalTracking\": [\n        {\n          \"slug\": \"<string>\",\n          \"url\": \"<uri>\",\n          \"trackingId\": \"<string>\",\n          \"method\": \"<string>\"\n        },\n        {\n          \"slug\": \"<string>\",\n          \"url\": \"<uri>\",\n          \"trackingId\": \"<string>\",\n          \"method\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"error\": \"<string>\",\n  \"message\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "79b60fcb-25bf-4854-aa5c-973fcf0f20de",
+              "name": "Return any 2xx status after accepting the webhook payload. The response body is ignored.",
+              "originalRequest": {
+                "url": {
+                  "protocol": "https",
+                  "path": [
+                    "parcels-webhook"
+                  ],
+                  "host": [
+                    "example",
+                    "com"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"event\": \"shipment_completed\",\n  \"uuid\": \"demo_mixed_cache\",\n  \"timestamp\": \"2026-07-07T06:45:00.000Z\",\n  \"done\": false,\n  \"shipment\": {\n    \"trackingId\": \"9400111206213785678901\",\n    \"status\": \"delivered\",\n    \"origin\": \"United States\",\n    \"destination\": \"United States\",\n    \"originCode\": \"US\",\n    \"destinationCode\": \"US\",\n    \"states\": [\n      {\n        \"state\": \"Delivered, In/At Mailbox\",\n        \"location\": \"Austin, TX, United States\",\n        \"date\": \"2026-06-25T18:42:00.000Z\",\n        \"carrier\": 0\n      },\n      {\n        \"state\": \"Arrived at Post Office\",\n        \"location\": \"Austin, TX, United States\",\n        \"date\": \"2026-06-25T13:17:00.000Z\",\n        \"carrier\": 0\n      }\n    ],\n    \"services\": [\n      {\n        \"slug\": \"usps\",\n        \"name\": \"USPS\"\n      }\n    ],\n    \"detectedCarrier\": {\n      \"slug\": \"usps\",\n      \"name\": \"USPS\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://parcelsapp.com/api/v3",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "12119195-49fe-48bf-b697-c4abff39bb9e",
+    "name": "Parcels Account Webhooks API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Track packages and shipments worldwide through the Parcels API. Tracking is asynchronous: create a tracking request, then poll by UUID until the result is complete. Use the Mock API server in this documentation to try the flow without an API key or account limits.\n\nContact Support:\n Name: Parcels\n Email: hello@parcelsapp.com",
+      "type": "text/plain"
+    }
+  }
+}

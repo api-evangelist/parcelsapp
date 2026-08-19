@@ -1,0 +1,219 @@
+{
+  "item": [
+    {
+      "id": "a23ec567-b8c4-4d6c-87e3-711d04cd6f45",
+      "name": "Tracking",
+      "description": {
+        "content": "Create tracking requests and read results",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "a937457a-3657-40c7-a3d3-d64dcddefddb",
+          "name": "Create tracking request",
+          "request": {
+            "name": "Create tracking request",
+            "description": {
+              "content": "Creates an asynchronous tracking request. The response usually contains a temporary `uuid`; use that UUID with `GET /shipments/tracking` to read results, or pass `webhookUrl` to receive callbacks.\n\nCached results can be returned immediately in the `shipments` array:\n- If every requested shipment is already cached, the API returns `done: true`, `fromCache: true`, and populated `shipments` immediately. In this case there may be no `uuid`, because no new tracking request is needed.\n- If only some shipments are cached, the API returns a `uuid`, `fromCache: true`, and the cached subset in `shipments`. Continue polling by `uuid` or wait for webhook callbacks for the remaining shipments.\n- If nothing is cached yet, the API returns a `uuid` and an empty `shipments` array while tracking continues in the background.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "shipments",
+                "tracking"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"apiKey\": \"<string>\",\n  \"shipments\": [\n    {\n      \"trackingId\": \"<string>\",\n      \"destinationCountry\": \"<string>\",\n      \"country\": \"<string>\",\n      \"zipcode\": \"<string>\",\n      \"slugs\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"language\": \"<string>\",\n  \"webhookUrl\": \"<uri>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "070229fa-b0e5-460e-948b-b96f1916531e",
+              "name": "Tracking request, cached tracking result, or API error. Business errors are returned as JSON with an `error` field.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "shipments",
+                    "tracking"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"apiKey\": \"<YOUR_API_KEY>\",\n  \"language\": \"en\",\n  \"shipments\": [\n    {\n      \"trackingId\": \"9400111206213785678901\",\n      \"destinationCountry\": \"United States\"\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"uuid\": \"demo_usps_delivered\",\n  \"shipments\": []\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "dc55b520-f0a9-425e-a839-a095217f9820",
+          "name": "Read tracking results",
+          "request": {
+            "name": "Read tracking results",
+            "description": {
+              "content": "Polls a tracking request by UUID. Keep polling every few seconds until `done` is `true`. Do not pass a tracking number to this endpoint; use only the UUID returned by `POST /shipments/tracking`.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "shipments",
+                "tracking"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "uuid",
+                  "value": "<string>",
+                  "description": "(Required) Temporary tracking request UUID returned by create tracking request."
+                },
+                {
+                  "disabled": false,
+                  "key": "apiKey",
+                  "value": "<string>",
+                  "description": "(Required) API key from the Parcels dashboard. Not required on the Mock API server."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "1343e826-74e7-40d8-b255-a99be421fc41",
+              "name": "Tracking result or API error.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "shipments",
+                    "tracking"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "uuid",
+                      "value": "demo_usps_delivered"
+                    },
+                    {
+                      "key": "apiKey",
+                      "value": "pk_live_your_api_key"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"uuid\": \"demo_usps_delivered\",\n  \"done\": true,\n  \"shipments\": [\n    {\n      \"trackingId\": \"9400111206213785678901\",\n      \"status\": \"delivered\",\n      \"origin\": \"United States\",\n      \"destination\": \"United States\",\n      \"originCode\": \"US\",\n      \"destinationCode\": \"US\",\n      \"states\": [\n        {\n          \"state\": \"Delivered, In/At Mailbox\",\n          \"location\": \"Austin, TX, United States\",\n          \"date\": \"2026-06-25T18:42:00.000Z\",\n          \"carrier\": 0\n        }\n      ],\n      \"services\": [\n        {\n          \"slug\": \"usps\",\n          \"name\": \"USPS\"\n        }\n      ],\n      \"detectedCarrier\": {\n        \"slug\": \"usps\",\n        \"name\": \"USPS\"\n      }\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://parcelsapp.com/api/v3",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "5c603788-b36b-4aa5-a04f-86eefb8acdd3",
+    "name": "Parcels Account Tracking API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Track packages and shipments worldwide through the Parcels API. Tracking is asynchronous: create a tracking request, then poll by UUID until the result is complete. Use the Mock API server in this documentation to try the flow without an API key or account limits.\n\nContact Support:\n Name: Parcels\n Email: hello@parcelsapp.com",
+      "type": "text/plain"
+    }
+  }
+}

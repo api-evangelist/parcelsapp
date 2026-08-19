@@ -1,0 +1,33 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Parcels Account Webhooks API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Webhooks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Receive tracking webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://parcelsapp.com/api/v3/parcels-webhook",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "This is the endpoint that you host, not a Parcels API endpoint. Provide its URL as `webhookUrl` when creating a tracking request.\n\nParcels sends `POST` requests with `Content-Type: application/json`. Return any 2xx response quickly after accepting the payload. Network errors, timeouts, and HTTP 4xx/5xx responses are treated as failed deliveries and may be retried.\n\nTypical flow: create tracking with `webhookUrl`, save the returned `uuid`, then match incoming webhook events by `uuid`. For batches"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

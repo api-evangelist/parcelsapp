@@ -1,0 +1,37 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Parcels Account API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Account",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Check account usage",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://parcelsapp.com/api/v3/account",
+            "params": [
+              {
+                "name": "apiKey",
+                "value": "",
+                "type": "query",
+                "description": "API key from the Parcels dashboard. Not required on the Mock API server."
+              }
+            ]
+          },
+          "docs": "Returns the current subscription plan, shipment limit, usage counter, and reset date. On the Mock API server this endpoint returns a fixed demo account and does not require `apiKey`."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

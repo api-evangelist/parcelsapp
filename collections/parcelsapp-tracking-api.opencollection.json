@@ -1,0 +1,58 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Parcels Account Tracking API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Tracking",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Read tracking results",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://parcelsapp.com/api/v3/shipments/tracking",
+            "params": [
+              {
+                "name": "uuid",
+                "value": "",
+                "type": "query",
+                "description": "Temporary tracking request UUID returned by create tracking request."
+              },
+              {
+                "name": "apiKey",
+                "value": "",
+                "type": "query",
+                "description": "API key from the Parcels dashboard. Not required on the Mock API server."
+              }
+            ]
+          },
+          "docs": "Polls a tracking request by UUID. Keep polling every few seconds until `done` is `true`. Do not pass a tracking number to this endpoint; use only the UUID returned by `POST /shipments/tracking`."
+        },
+        {
+          "info": {
+            "name": "Create tracking request",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://parcelsapp.com/api/v3/shipments/tracking",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates an asynchronous tracking request. The response usually contains a temporary `uuid`; use that UUID with `GET /shipments/tracking` to read results, or pass `webhookUrl` to receive callbacks.\n\nCached results can be returned immediately in the `shipments` array:\n- If every requested shipment is already cached, the API returns `done: true`, `fromCache: true`, and populated `shipments` immediately. In this case there may be no `uuid`, because no new tracking request is needed.\n- If only some s"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
