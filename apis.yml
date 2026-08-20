@@ -70,6 +70,8 @@ apis:
   humanURL: https://parcelsapp.com/api-docs/
   baseURL: https://parcelsapp.com/api/v3
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI
