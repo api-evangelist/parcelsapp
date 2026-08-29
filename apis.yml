@@ -93,6 +93,9 @@ apis:
   - type: APIReference
     url: https://parcelsapp.com/api-docs/openapi.json
 common:
+- type: CapabilityMap
+  url: capabilities/parcelsapp-capability-edges.yml
+  name: Parcels App Business Capability Map
 - type: AgenticAccess
   url: agentic-access/parcelsapp-agentic-access.yml
 - type: DomainSecurity
