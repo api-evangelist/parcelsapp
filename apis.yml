@@ -10,6 +10,18 @@ description: Parcels App (parcelsapp.com) is a universal parcel tracking service
   poll by UUID or receive webhook callbacks until results are complete - with
   automatic carrier detection, localized tracking events, and cached results
   returned immediately.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: freemium
   onboarding: unknown
