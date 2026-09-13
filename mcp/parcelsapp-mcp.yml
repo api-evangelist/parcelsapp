@@ -1,0 +1,25 @@
+generated: '2026-09-11'
+method: probed
+source: https://parcelsapp.com/mcp
+status: published
+server:
+  name: parcelsapp
+  transport: http
+  url: https://parcelsapp.com/mcp
+deployment:
+  mode: remote
+  endpoint: https://parcelsapp.com/mcp
+  verified: probed
+  probe: live
+  checked: '2026-09-11'
+  source: docs-check 2026-09-11 (endpoint found in the provider's own documentation, then probed)
+tools_count: 3
+tools:
+- name: track_shipment
+  description: ''
+- name: search_supported_carriers
+  description: ''
+- name: get_tracking_result
+  description: ''
+tools_source: live tools/list via initialize handshake, 2026-09-11 (signals/audit_mcp_authorship.py --probe)
+authorship: provider
