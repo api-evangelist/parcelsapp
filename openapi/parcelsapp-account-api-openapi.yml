@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
   title: Parcels Account API
   version: 1.0.0
@@ -83,31 +83,6 @@ paths:
           ?>'
 components:
   schemas:
-    AccountInfo:
-      type: object
-      required:
-      - plan
-      - limit
-      - current
-      - resetDate
-      properties:
-        plan:
-          type: string
-          description: Current subscription plan name.
-          example: Pro
-        limit:
-          type: integer
-          description: Shipment limit for the current period.
-          example: 3000
-        current:
-          type: integer
-          description: Shipments already used in the current period.
-          example: 142
-        resetDate:
-          type: string
-          format: date-time
-          description: UTC date when the usage counter resets.
-          example: '2026-08-01T00:00:00.000Z'
     ErrorResponse:
       type: object
       required:
@@ -152,6 +127,31 @@ components:
           format: date-time
           description: Expiration time for `confirmationUrl`.
           example: '2026-07-08T12:00:00.000Z'
+    AccountInfo:
+      type: object
+      required:
+      - plan
+      - limit
+      - current
+      - resetDate
+      properties:
+        plan:
+          type: string
+          description: Current subscription plan name.
+          example: Pro
+        limit:
+          type: integer
+          description: Shipment limit for the current period.
+          example: 3000
+        current:
+          type: integer
+          description: Shipments already used in the current period.
+          example: 142
+        resetDate:
+          type: string
+          format: date-time
+          description: UTC date when the usage counter resets.
+          example: '2026-08-01T00:00:00.000Z'
 x-tagGroups:
 - name: Guide
   tags:

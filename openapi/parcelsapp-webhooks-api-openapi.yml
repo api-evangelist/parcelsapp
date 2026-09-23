@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Parcels Account Webhooks API
+  title: Parcels Webhooks API
   version: 1.0.0
   description: 'Track packages and shipments worldwide through the Parcels API. Tracking is asynchronous: create a tracking request, then poll by UUID until the result is complete. Use the Mock API server in this documentation to try the flow without an API key or account limits.'
   contact:
@@ -119,97 +119,6 @@ paths:
         source: "<?php\n$event = json_decode(file_get_contents('php://input'), true);\n\nif ($event['event'] === 'shipment_completed') {\n  error_log('Shipment finished ' . $event['uuid'] . ' ' . $event['shipment']['trackingId']);\n}\n\nif ($event['event'] === 'batch_completed') {\n  error_log('Batch finished ' . $event['uuid'] . ' ' . count($event['shipments'] ?? []));\n}\n\nhttp_response_code(204);\n?>"
 components:
   schemas:
-    Attribute:
-      type: object
-      properties:
-        l:
-          type: string
-          description: Attribute label.
-          example: origin
-        n:
-          type: string
-          description: Optional display name.
-          example: Weight
-        val:
-          type: string
-          description: Attribute value.
-          example: United States
-        code:
-          type: string
-          description: Optional code value.
-          example: US
-    Carrier:
-      type: object
-      properties:
-        slug:
-          type: string
-          description: Carrier identifier.
-          example: usps
-        name:
-          type: string
-          description: Carrier display name.
-          example: USPS
-    Shipment:
-      type: object
-      properties:
-        trackingId:
-          type: string
-          description: Tracking number.
-          example: '9400111206213785678901'
-        status:
-          type: string
-          description: Current normalized shipment status.
-          enum:
-          - transit
-          - arrived
-          - pickup
-          - delivered
-          - returned
-          - archive
-          example: delivered
-        origin:
-          type: string
-          description: Localized origin country.
-          example: United States
-        destination:
-          type: string
-          description: Localized destination country.
-          example: United States
-        originCode:
-          type: string
-          description: Two-letter origin country code.
-          example: US
-        destinationCode:
-          type: string
-          description: Two-letter destination country code.
-          example: US
-        states:
-          type: array
-          description: Tracking events in reverse chronological order.
-          items:
-            $ref: '#/components/schemas/Event'
-        services:
-          type: array
-          description: Carriers queried for this tracking number.
-          items:
-            $ref: '#/components/schemas/Carrier'
-        detectedCarrier:
-          $ref: '#/components/schemas/Carrier'
-        detected:
-          type: array
-          description: Indexes into `services` where tracking events were found.
-          items:
-            type: integer
-        attributes:
-          type: array
-          description: Additional carrier metadata such as origin, destination, weight, or references.
-          items:
-            $ref: '#/components/schemas/Attribute'
-        externalTracking:
-          type: array
-          description: Direct carrier tracking links.
-          items:
-            $ref: '#/components/schemas/OutgoingLink'
     OutgoingLink:
       type: object
       properties:
@@ -290,6 +199,97 @@ components:
           type: string
           example: Failed to save tracking result
           description: 'Present on `tracking_error`: human-readable error details.'
+    Shipment:
+      type: object
+      properties:
+        trackingId:
+          type: string
+          description: Tracking number.
+          example: '9400111206213785678901'
+        status:
+          type: string
+          description: Current normalized shipment status.
+          enum:
+          - transit
+          - arrived
+          - pickup
+          - delivered
+          - returned
+          - archive
+          example: delivered
+        origin:
+          type: string
+          description: Localized origin country.
+          example: United States
+        destination:
+          type: string
+          description: Localized destination country.
+          example: United States
+        originCode:
+          type: string
+          description: Two-letter origin country code.
+          example: US
+        destinationCode:
+          type: string
+          description: Two-letter destination country code.
+          example: US
+        states:
+          type: array
+          description: Tracking events in reverse chronological order.
+          items:
+            $ref: '#/components/schemas/Event'
+        services:
+          type: array
+          description: Carriers queried for this tracking number.
+          items:
+            $ref: '#/components/schemas/Carrier'
+        detectedCarrier:
+          $ref: '#/components/schemas/Carrier'
+        detected:
+          type: array
+          description: Indexes into `services` where tracking events were found.
+          items:
+            type: integer
+        attributes:
+          type: array
+          description: Additional carrier metadata such as origin, destination, weight, or references.
+          items:
+            $ref: '#/components/schemas/Attribute'
+        externalTracking:
+          type: array
+          description: Direct carrier tracking links.
+          items:
+            $ref: '#/components/schemas/OutgoingLink'
+    Attribute:
+      type: object
+      properties:
+        l:
+          type: string
+          description: Attribute label.
+          example: origin
+        n:
+          type: string
+          description: Optional display name.
+          example: Weight
+        val:
+          type: string
+          description: Attribute value.
+          example: United States
+        code:
+          type: string
+          description: Optional code value.
+          example: US
+    Carrier:
+      type: object
+      properties:
+        slug:
+          type: string
+          description: Carrier identifier.
+          example: usps
+        name:
+          type: string
+          description: Carrier display name.
+          example: USPS
 x-tagGroups:
 - name: Guide
   tags:

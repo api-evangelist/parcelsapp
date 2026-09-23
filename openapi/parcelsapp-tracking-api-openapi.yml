@@ -1,6 +1,6 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Parcels Account Tracking API
+  title: Parcels Tracking API
   version: 1.0.0
   description: 'Track packages and shipments worldwide through the Parcels API. Tracking is asynchronous: create a tracking request, then poll by UUID until the result is complete. Use the Mock API server in this documentation to try the flow without an API key or account limits.'
   contact:
@@ -287,17 +287,90 @@ components:
           - GET
           - POST
           example: GET
-    Carrier:
+    ErrorResponse:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          description: Stable error code.
+          enum:
+          - MISSING_API_KEY
+          - INVALID_API_KEY
+          - UNCONFIRMED_ACCOUNT
+          - SUBSCRIPTION_NOT_FOUND
+          - SUBSCRIPTION_INACTIVE
+          - SUBSCRIPTION_LIMIT_REACHED
+          - INVALID_SUBSCRIPTION_STATE
+          - INVALID_PARAMS
+          - NO_SHIPMENTS
+          - BUSY
+          - INVALID_WEBHOOK_URL
+          - MISSING_UUID
+          - TIMEDOUT
+          - NO_REQUEST_FOUND
+          - SERVER_ERROR
+          - FORBIDDEN
+          example: INVALID_API_KEY
+        description:
+          type: string
+          description: Human-readable error details when available.
+          example: No .apiKey found
+        uuid:
+          type: string
+          description: Tracking request UUID, when relevant.
+          example: demo_usps_delivered
+        confirmationUrl:
+          type: string
+          format: uri
+          description: One-time account confirmation URL returned with `UNCONFIRMED_ACCOUNT`.
+          example: https://parcelsapp.com/api/v3/account/confirm/user%40example.com/0123456789abcdef
+        confirmationExpiresAt:
+          type: string
+          format: date-time
+          description: Expiration time for `confirmationUrl`.
+          example: '2026-07-08T12:00:00.000Z'
+    Event:
       type: object
       properties:
-        slug:
+        state:
           type: string
-          description: Carrier identifier.
-          example: usps
-        name:
+          description: Human-readable tracking event text.
+          example: Delivered, In/At Mailbox
+        location:
           type: string
-          description: Carrier display name.
-          example: USPS
+          description: Event location.
+          example: Austin, TX, United States
+        date:
+          type: string
+          format: date-time
+          description: UTC event timestamp.
+          example: '2026-06-25T18:42:00.000Z'
+        carrier:
+          type: integer
+          description: Index of the reporting carrier in the `services` array.
+          example: 0
+    TrackingResult:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Temporary tracking request UUID. It can be absent when the create response is fully served from cache and `done` is `true`.
+          example: demo_usps_delivered
+        done:
+          type: boolean
+          description: True when all shipments in the request have finished tracking.
+          example: true
+        fromCache:
+          type: boolean
+          description: 'True when the response includes cached tracking data. A create response can include both `uuid` and `fromCache: true` when only part of the request was cached.'
+          example: true
+        shipments:
+          type: array
+          description: Finished shipment results. On create, this can contain immediately available cached results; use `uuid` or webhooks for any remaining shipments.
+          items:
+            $ref: '#/components/schemas/Shipment'
     Shipment:
       type: object
       properties:
@@ -359,95 +432,17 @@ components:
           description: Direct carrier tracking links.
           items:
             $ref: '#/components/schemas/OutgoingLink'
-    ErrorResponse:
-      type: object
-      required:
-      - error
-      properties:
-        error:
-          type: string
-          description: Stable error code.
-          enum:
-          - MISSING_API_KEY
-          - INVALID_API_KEY
-          - UNCONFIRMED_ACCOUNT
-          - SUBSCRIPTION_NOT_FOUND
-          - SUBSCRIPTION_INACTIVE
-          - SUBSCRIPTION_LIMIT_REACHED
-          - INVALID_SUBSCRIPTION_STATE
-          - INVALID_PARAMS
-          - NO_SHIPMENTS
-          - BUSY
-          - INVALID_WEBHOOK_URL
-          - MISSING_UUID
-          - TIMEDOUT
-          - NO_REQUEST_FOUND
-          - SERVER_ERROR
-          - FORBIDDEN
-          example: INVALID_API_KEY
-        description:
-          type: string
-          description: Human-readable error details when available.
-          example: No .apiKey found
-        uuid:
-          type: string
-          description: Tracking request UUID, when relevant.
-          example: demo_usps_delivered
-        confirmationUrl:
-          type: string
-          format: uri
-          description: One-time account confirmation URL returned with `UNCONFIRMED_ACCOUNT`.
-          example: https://parcelsapp.com/api/v3/account/confirm/user%40example.com/0123456789abcdef
-        confirmationExpiresAt:
-          type: string
-          format: date-time
-          description: Expiration time for `confirmationUrl`.
-          example: '2026-07-08T12:00:00.000Z'
-    TrackingResult:
+    Carrier:
       type: object
       properties:
-        uuid:
+        slug:
           type: string
-          description: Temporary tracking request UUID. It can be absent when the create response is fully served from cache and `done` is `true`.
-          example: demo_usps_delivered
-        done:
-          type: boolean
-          description: True when all shipments in the request have finished tracking.
-          example: true
-        fromCache:
-          type: boolean
-          description: 'True when the response includes cached tracking data. A create response can include both `uuid` and `fromCache: true` when only part of the request was cached.'
-          example: true
-        shipments:
-          type: array
-          description: Finished shipment results. On create, this can contain immediately available cached results; use `uuid` or webhooks for any remaining shipments.
-          items:
-            $ref: '#/components/schemas/Shipment'
-    TrackingRequest:
-      type: object
-      required:
-      - apiKey
-      - shipments
-      properties:
-        apiKey:
+          description: Carrier identifier.
+          example: usps
+        name:
           type: string
-          description: API key from the Parcels dashboard. Not required on the Mock API server.
-          example: pk_live_your_api_key
-        language:
-          type: string
-          description: Two-letter language code for localized countries and events. Defaults to `en`.
-          example: en
-        shipments:
-          type: array
-          minItems: 1
-          description: Shipments to track.
-          items:
-            $ref: '#/components/schemas/TrackingItem'
-        webhookUrl:
-          type: string
-          format: uri
-          description: Optional public HTTPS endpoint that receives tracking callbacks. In production it must use HTTPS and cannot point to localhost or private networks. Parcels sends `POST` requests with a JSON `WebhookPayload` body.
-          example: https://example.com/parcels-webhook
+          description: Carrier display name.
+          example: USPS
     TrackingItem:
       type: object
       required:
@@ -476,26 +471,31 @@ components:
             type: string
           example:
           - usps
-    Event:
+    TrackingRequest:
       type: object
+      required:
+      - apiKey
+      - shipments
       properties:
-        state:
+        apiKey:
           type: string
-          description: Human-readable tracking event text.
-          example: Delivered, In/At Mailbox
-        location:
+          description: API key from the Parcels dashboard. Not required on the Mock API server.
+          example: pk_live_your_api_key
+        language:
           type: string
-          description: Event location.
-          example: Austin, TX, United States
-        date:
+          description: Two-letter language code for localized countries and events. Defaults to `en`.
+          example: en
+        shipments:
+          type: array
+          minItems: 1
+          description: Shipments to track.
+          items:
+            $ref: '#/components/schemas/TrackingItem'
+        webhookUrl:
           type: string
-          format: date-time
-          description: UTC event timestamp.
-          example: '2026-06-25T18:42:00.000Z'
-        carrier:
-          type: integer
-          description: Index of the reporting carrier in the `services` array.
-          example: 0
+          format: uri
+          description: Optional public HTTPS endpoint that receives tracking callbacks. In production it must use HTTPS and cannot point to localhost or private networks. Parcels sends `POST` requests with a JSON `WebhookPayload` body.
+          example: https://example.com/parcels-webhook
 x-tagGroups:
 - name: Guide
   tags:
