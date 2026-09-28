@@ -16,10 +16,18 @@ deployment:
 tools_count: 3
 tools:
 - name: track_shipment
-  description: ''
+  description: Use this when the user provides a tracking number or supported tracking URL and asks to
+    track, locate, check, monitor, or update the status of one package, parcel, shipment, or delivery.
+    This includes questions about where a shipment is, wh
 - name: search_supported_carriers
-  description: ''
+  description: Use this when the user asks which couriers Parcels supports, names a courier that must
+    be converted to an exact carrier slug, wants to choose a carrier, or a tracking error asks for carrier
+    selection. Search by carrier name or slug; omit qu
 - name: get_tracking_result
-  description: ''
+  description: Use this only as the required continuation after track_shipment returns state pending.
+    Wait for retryAfterSeconds, pass the returned requestToken unchanged as request_token, and keep calling
+    this tool while the result remains pending until
 tools_source: live tools/list via initialize handshake, 2026-09-11 (signals/audit_mcp_authorship.py --probe)
 authorship: provider
+descriptions_source: live tools/list (authorship probe or saved capture); filled by backfill-tools-from-authorship.py
+  --descriptions, 2026-09-28
