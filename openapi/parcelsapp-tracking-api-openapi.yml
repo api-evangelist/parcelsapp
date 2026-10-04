@@ -249,106 +249,6 @@ paths:
           ?>'
 components:
   schemas:
-    Attribute:
-      type: object
-      properties:
-        l:
-          type: string
-          description: Attribute label.
-          example: origin
-        n:
-          type: string
-          description: Optional display name.
-          example: Weight
-        val:
-          type: string
-          description: Attribute value.
-          example: United States
-        code:
-          type: string
-          description: Optional code value.
-          example: US
-    Shipment:
-      type: object
-      properties:
-        trackingId:
-          type: string
-          description: Tracking number.
-          example: '9400111206213785678901'
-        status:
-          type: string
-          description: Current normalized shipment status.
-          enum:
-          - transit
-          - arrived
-          - pickup
-          - delivered
-          - returned
-          - archive
-          example: delivered
-        origin:
-          type: string
-          description: Localized origin country.
-          example: United States
-        destination:
-          type: string
-          description: Localized destination country.
-          example: United States
-        originCode:
-          type: string
-          description: Two-letter origin country code.
-          example: US
-        destinationCode:
-          type: string
-          description: Two-letter destination country code.
-          example: US
-        states:
-          type: array
-          description: Tracking events in reverse chronological order.
-          items:
-            $ref: '#/components/schemas/Event'
-        services:
-          type: array
-          description: Carriers queried for this tracking number.
-          items:
-            $ref: '#/components/schemas/Carrier'
-        detectedCarrier:
-          $ref: '#/components/schemas/Carrier'
-        detected:
-          type: array
-          description: Indexes into `services` where tracking events were found.
-          items:
-            type: integer
-        attributes:
-          type: array
-          description: Additional carrier metadata such as origin, destination, weight, or references.
-          items:
-            $ref: '#/components/schemas/Attribute'
-        externalTracking:
-          type: array
-          description: Direct carrier tracking links.
-          items:
-            $ref: '#/components/schemas/OutgoingLink'
-    TrackingResult:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: Temporary tracking request UUID. It can be absent when the create response is fully served from cache and `done` is `true`.
-          example: demo_usps_delivered
-        done:
-          type: boolean
-          description: True when all shipments in the request have finished tracking.
-          example: true
-        fromCache:
-          type: boolean
-          description: 'True when the response includes cached tracking data. A create response can include both `uuid` and `fromCache: true` when only part of the request was cached.'
-          example: true
-        shipments:
-          type: array
-          description: Finished shipment results. On create, this can contain immediately available cached results; use `uuid` or webhooks for any remaining shipments.
-          items:
-            $ref: '#/components/schemas/Shipment'
     Event:
       type: object
       properties:
@@ -413,6 +313,116 @@ components:
           format: date-time
           description: Expiration time for `confirmationUrl`.
           example: '2026-07-08T12:00:00.000Z'
+    Attribute:
+      type: object
+      properties:
+        l:
+          type: string
+          description: Attribute label.
+          example: origin
+        n:
+          type: string
+          description: Optional display name.
+          example: Weight
+        val:
+          type: string
+          description: Attribute value.
+          example: United States
+        code:
+          type: string
+          description: Optional code value.
+          example: US
+    OutgoingLink:
+      type: object
+      properties:
+        slug:
+          type: string
+          example: usps
+        url:
+          type: string
+          format: uri
+          example: https://tools.usps.com/go/TrackConfirmAction?tLabels=9400111206213785678901
+        trackingId:
+          type: string
+          example: '9400111206213785678901'
+        method:
+          type: string
+          enum:
+          - GET
+          - POST
+          example: GET
+    Shipment:
+      type: object
+      properties:
+        trackingId:
+          type: string
+          description: Tracking number.
+          example: '9400111206213785678901'
+        status:
+          type: string
+          description: Current normalized shipment status.
+          enum:
+          - transit
+          - arrived
+          - pickup
+          - delivered
+          - returned
+          - archive
+          example: delivered
+        origin:
+          type: string
+          description: Localized origin country.
+          example: United States
+        destination:
+          type: string
+          description: Localized destination country.
+          example: United States
+        originCode:
+          type: string
+          description: Two-letter origin country code.
+          example: US
+        destinationCode:
+          type: string
+          description: Two-letter destination country code.
+          example: US
+        states:
+          type: array
+          description: Tracking events in reverse chronological order.
+          items:
+            $ref: '#/components/schemas/Event'
+        services:
+          type: array
+          description: Carriers queried for this tracking number.
+          items:
+            $ref: '#/components/schemas/Carrier'
+        detectedCarrier:
+          $ref: '#/components/schemas/Carrier'
+        detected:
+          type: array
+          description: Indexes into `services` where tracking events were found.
+          items:
+            type: integer
+        attributes:
+          type: array
+          description: Additional carrier metadata such as origin, destination, weight, or references.
+          items:
+            $ref: '#/components/schemas/Attribute'
+        externalTracking:
+          type: array
+          description: Direct carrier tracking links.
+          items:
+            $ref: '#/components/schemas/OutgoingLink'
+    Carrier:
+      type: object
+      properties:
+        slug:
+          type: string
+          description: Carrier identifier.
+          example: usps
+        name:
+          type: string
+          description: Carrier display name.
+          example: USPS
     TrackingItem:
       type: object
       required:
@@ -441,6 +451,26 @@ components:
             type: string
           example:
           - usps
+    TrackingResult:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Temporary tracking request UUID. It can be absent when the create response is fully served from cache and `done` is `true`.
+          example: demo_usps_delivered
+        done:
+          type: boolean
+          description: True when all shipments in the request have finished tracking.
+          example: true
+        fromCache:
+          type: boolean
+          description: 'True when the response includes cached tracking data. A create response can include both `uuid` and `fromCache: true` when only part of the request was cached.'
+          example: true
+        shipments:
+          type: array
+          description: Finished shipment results. On create, this can contain immediately available cached results; use `uuid` or webhooks for any remaining shipments.
+          items:
+            $ref: '#/components/schemas/Shipment'
     TrackingRequest:
       type: object
       required:
@@ -466,36 +496,6 @@ components:
           format: uri
           description: Optional public HTTPS endpoint that receives tracking callbacks. In production it must use HTTPS and cannot point to localhost or private networks. Parcels sends `POST` requests with a JSON `WebhookPayload` body.
           example: https://example.com/parcels-webhook
-    OutgoingLink:
-      type: object
-      properties:
-        slug:
-          type: string
-          example: usps
-        url:
-          type: string
-          format: uri
-          example: https://tools.usps.com/go/TrackConfirmAction?tLabels=9400111206213785678901
-        trackingId:
-          type: string
-          example: '9400111206213785678901'
-        method:
-          type: string
-          enum:
-          - GET
-          - POST
-          example: GET
-    Carrier:
-      type: object
-      properties:
-        slug:
-          type: string
-          description: Carrier identifier.
-          example: usps
-        name:
-          type: string
-          description: Carrier display name.
-          example: USPS
 x-tagGroups:
 - name: Guide
   tags:
