@@ -119,6 +119,47 @@ paths:
         source: "<?php\n$event = json_decode(file_get_contents('php://input'), true);\n\nif ($event['event'] === 'shipment_completed') {\n  error_log('Shipment finished ' . $event['uuid'] . ' ' . $event['shipment']['trackingId']);\n}\n\nif ($event['event'] === 'batch_completed') {\n  error_log('Batch finished ' . $event['uuid'] . ' ' . count($event['shipments'] ?? []));\n}\n\nhttp_response_code(204);\n?>"
 components:
   schemas:
+    WebhookPayload:
+      type: object
+      description: JSON body Parcels sends to the `webhookUrl` from `POST /shipments/tracking`. A `shipment_completed` event contains `shipment`; a `batch_completed` event contains `shipments`; a `tracking_error` event contains `error` and `message`.
+      properties:
+        event:
+          type: string
+          enum:
+          - shipment_completed
+          - batch_completed
+          - tracking_error
+          example: batch_completed
+          description: Webhook event type. `shipment_completed` means one newly tracked shipment finished. `batch_completed` means all newly tracked, non-cached shipments for the UUID finished.
+        uuid:
+          type: string
+          example: demo_usps_delivered
+          description: Tracking request UUID returned by `POST /shipments/tracking`.
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-06-25T18:43:00.000Z'
+        done:
+          type: boolean
+          example: true
+          description: '`true` when the whole tracking request is complete. Individual shipment events usually have `done: false`; the final batch event has `done: true`.'
+        shipment:
+          allOf:
+          - $ref: '#/components/schemas/Shipment'
+          description: 'Present on `shipment_completed`: the finished newly tracked shipment result.'
+        shipments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shipment'
+          description: 'Present on `batch_completed`: finished results for the newly tracked, non-cached shipments in this UUID. Cached shipments, if any, were already returned in the create response.'
+        error:
+          type: string
+          example: TRACKING_ERROR
+          description: 'Present on `tracking_error`: stable error type.'
+        message:
+          type: string
+          example: Failed to save tracking result
+          description: 'Present on `tracking_error`: human-readable error details.'
     Event:
       type: object
       properties:
@@ -177,6 +218,17 @@ components:
           - GET
           - POST
           example: GET
+    Carrier:
+      type: object
+      properties:
+        slug:
+          type: string
+          description: Carrier identifier.
+          example: usps
+        name:
+          type: string
+          description: Carrier display name.
+          example: USPS
     Shipment:
       type: object
       properties:
@@ -238,58 +290,6 @@ components:
           description: Direct carrier tracking links.
           items:
             $ref: '#/components/schemas/OutgoingLink'
-    Carrier:
-      type: object
-      properties:
-        slug:
-          type: string
-          description: Carrier identifier.
-          example: usps
-        name:
-          type: string
-          description: Carrier display name.
-          example: USPS
-    WebhookPayload:
-      type: object
-      description: JSON body Parcels sends to the `webhookUrl` from `POST /shipments/tracking`. A `shipment_completed` event contains `shipment`; a `batch_completed` event contains `shipments`; a `tracking_error` event contains `error` and `message`.
-      properties:
-        event:
-          type: string
-          enum:
-          - shipment_completed
-          - batch_completed
-          - tracking_error
-          example: batch_completed
-          description: Webhook event type. `shipment_completed` means one newly tracked shipment finished. `batch_completed` means all newly tracked, non-cached shipments for the UUID finished.
-        uuid:
-          type: string
-          example: demo_usps_delivered
-          description: Tracking request UUID returned by `POST /shipments/tracking`.
-        timestamp:
-          type: string
-          format: date-time
-          example: '2026-06-25T18:43:00.000Z'
-        done:
-          type: boolean
-          example: true
-          description: '`true` when the whole tracking request is complete. Individual shipment events usually have `done: false`; the final batch event has `done: true`.'
-        shipment:
-          allOf:
-          - $ref: '#/components/schemas/Shipment'
-          description: 'Present on `shipment_completed`: the finished newly tracked shipment result.'
-        shipments:
-          type: array
-          items:
-            $ref: '#/components/schemas/Shipment'
-          description: 'Present on `batch_completed`: finished results for the newly tracked, non-cached shipments in this UUID. Cached shipments, if any, were already returned in the create response.'
-        error:
-          type: string
-          example: TRACKING_ERROR
-          description: 'Present on `tracking_error`: stable error type.'
-        message:
-          type: string
-          example: Failed to save tracking result
-          description: 'Present on `tracking_error`: human-readable error details.'
 x-tagGroups:
 - name: Guide
   tags:

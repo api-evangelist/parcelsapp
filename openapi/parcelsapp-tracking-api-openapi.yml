@@ -249,6 +249,42 @@ paths:
           ?>'
 components:
   schemas:
+    Carrier:
+      type: object
+      properties:
+        slug:
+          type: string
+          description: Carrier identifier.
+          example: usps
+        name:
+          type: string
+          description: Carrier display name.
+          example: USPS
+    TrackingRequest:
+      type: object
+      required:
+      - apiKey
+      - shipments
+      properties:
+        apiKey:
+          type: string
+          description: API key from the Parcels dashboard. Not required on the Mock API server.
+          example: pk_live_your_api_key
+        language:
+          type: string
+          description: Two-letter language code for localized countries and events. Defaults to `en`.
+          example: en
+        shipments:
+          type: array
+          minItems: 1
+          description: Shipments to track.
+          items:
+            $ref: '#/components/schemas/TrackingItem'
+        webhookUrl:
+          type: string
+          format: uri
+          description: Optional public HTTPS endpoint that receives tracking callbacks. In production it must use HTTPS and cannot point to localhost or private networks. Parcels sends `POST` requests with a JSON `WebhookPayload` body.
+          example: https://example.com/parcels-webhook
     Event:
       type: object
       properties:
@@ -313,25 +349,54 @@ components:
           format: date-time
           description: Expiration time for `confirmationUrl`.
           example: '2026-07-08T12:00:00.000Z'
-    Attribute:
+    TrackingItem:
+      type: object
+      required:
+      - trackingId
+      properties:
+        trackingId:
+          type: string
+          description: Carrier tracking number.
+          example: '9400111206213785678901'
+        destinationCountry:
+          type: string
+          description: Full English destination country name. Required for most non-AWB parcel numbers.
+          example: United States
+        country:
+          type: string
+          description: Alias for `destinationCountry`.
+          example: United States
+        zipcode:
+          type: string
+          description: Postal code, if a carrier requires it.
+          example: '78701'
+        slugs:
+          type: array
+          description: Optional carrier slugs to force instead of auto-detection.
+          items:
+            type: string
+          example:
+          - usps
+    TrackingResult:
       type: object
       properties:
-        l:
+        uuid:
           type: string
-          description: Attribute label.
-          example: origin
-        n:
-          type: string
-          description: Optional display name.
-          example: Weight
-        val:
-          type: string
-          description: Attribute value.
-          example: United States
-        code:
-          type: string
-          description: Optional code value.
-          example: US
+          description: Temporary tracking request UUID. It can be absent when the create response is fully served from cache and `done` is `true`.
+          example: demo_usps_delivered
+        done:
+          type: boolean
+          description: True when all shipments in the request have finished tracking.
+          example: true
+        fromCache:
+          type: boolean
+          description: 'True when the response includes cached tracking data. A create response can include both `uuid` and `fromCache: true` when only part of the request was cached.'
+          example: true
+        shipments:
+          type: array
+          description: Finished shipment results. On create, this can contain immediately available cached results; use `uuid` or webhooks for any remaining shipments.
+          items:
+            $ref: '#/components/schemas/Shipment'
     OutgoingLink:
       type: object
       properties:
@@ -351,6 +416,25 @@ components:
           - GET
           - POST
           example: GET
+    Attribute:
+      type: object
+      properties:
+        l:
+          type: string
+          description: Attribute label.
+          example: origin
+        n:
+          type: string
+          description: Optional display name.
+          example: Weight
+        val:
+          type: string
+          description: Attribute value.
+          example: United States
+        code:
+          type: string
+          description: Optional code value.
+          example: US
     Shipment:
       type: object
       properties:
@@ -412,90 +496,6 @@ components:
           description: Direct carrier tracking links.
           items:
             $ref: '#/components/schemas/OutgoingLink'
-    Carrier:
-      type: object
-      properties:
-        slug:
-          type: string
-          description: Carrier identifier.
-          example: usps
-        name:
-          type: string
-          description: Carrier display name.
-          example: USPS
-    TrackingItem:
-      type: object
-      required:
-      - trackingId
-      properties:
-        trackingId:
-          type: string
-          description: Carrier tracking number.
-          example: '9400111206213785678901'
-        destinationCountry:
-          type: string
-          description: Full English destination country name. Required for most non-AWB parcel numbers.
-          example: United States
-        country:
-          type: string
-          description: Alias for `destinationCountry`.
-          example: United States
-        zipcode:
-          type: string
-          description: Postal code, if a carrier requires it.
-          example: '78701'
-        slugs:
-          type: array
-          description: Optional carrier slugs to force instead of auto-detection.
-          items:
-            type: string
-          example:
-          - usps
-    TrackingResult:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: Temporary tracking request UUID. It can be absent when the create response is fully served from cache and `done` is `true`.
-          example: demo_usps_delivered
-        done:
-          type: boolean
-          description: True when all shipments in the request have finished tracking.
-          example: true
-        fromCache:
-          type: boolean
-          description: 'True when the response includes cached tracking data. A create response can include both `uuid` and `fromCache: true` when only part of the request was cached.'
-          example: true
-        shipments:
-          type: array
-          description: Finished shipment results. On create, this can contain immediately available cached results; use `uuid` or webhooks for any remaining shipments.
-          items:
-            $ref: '#/components/schemas/Shipment'
-    TrackingRequest:
-      type: object
-      required:
-      - apiKey
-      - shipments
-      properties:
-        apiKey:
-          type: string
-          description: API key from the Parcels dashboard. Not required on the Mock API server.
-          example: pk_live_your_api_key
-        language:
-          type: string
-          description: Two-letter language code for localized countries and events. Defaults to `en`.
-          example: en
-        shipments:
-          type: array
-          minItems: 1
-          description: Shipments to track.
-          items:
-            $ref: '#/components/schemas/TrackingItem'
-        webhookUrl:
-          type: string
-          format: uri
-          description: Optional public HTTPS endpoint that receives tracking callbacks. In production it must use HTTPS and cannot point to localhost or private networks. Parcels sends `POST` requests with a JSON `WebhookPayload` body.
-          example: https://example.com/parcels-webhook
 x-tagGroups:
 - name: Guide
   tags:
