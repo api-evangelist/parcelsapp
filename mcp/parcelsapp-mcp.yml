@@ -18,15 +18,25 @@ tools:
 - name: track_shipment
   description: Use this when the user provides a tracking number or supported tracking URL and asks to
     track, locate, check, monitor, or update the status of one package, parcel, shipment, or delivery.
-    This includes questions about where a shipment is, wh
+    This includes questions about where a shipment is, whether it was delivered, or when it may arrive,
+    with or without a named carrier such as UPS, FedEx, DHL, USPS, Royal Mail, or China Post. Parcels
+    detects the carrier and returns cached or live status, events, route, weight, transit time, and available
+    shipment attributes. A carrier may return state requires_input with exact requiredFields such as postal
+    code, house number, phone digits, email, country, date, vessel, or another service-specific value.
+    Ask the user for those values and retry with additional_fields; never guess them. If the carrier must
+    be chosen, first use search_supported_carriers and pass its exact slug. Do not use for bulk monitoring,
+    shipping-label purchases, rate quotes, or delivery changes.
 - name: search_supported_carriers
   description: Use this when the user asks which couriers Parcels supports, names a courier that must
     be converted to an exact carrier slug, wants to choose a carrier, or a tracking error asks for carrier
-    selection. Search by carrier name or slug; omit qu
+    selection. Search by carrier name or slug; omit query to list common supported carriers. Return the
+    exact slug to pass to track_shipment as carrier_slug. This tool does not track a shipment.
 - name: get_tracking_result
   description: Use this only as the required continuation after track_shipment returns state pending.
     Wait for retryAfterSeconds, pass the returned requestToken unchanged as request_token, and keep calling
-    this tool while the result remains pending until
+    this tool while the result remains pending until it returns complete, requires_input, or error. If
+    requires_input is returned, stop polling, ask the user for requiredFields, and start a new track_shipment
+    call with additional_fields. Do not use it to start a new tracking request.
 tools_source: live tools/list via initialize handshake, 2026-09-11 (signals/audit_mcp_authorship.py --probe)
 authorship: provider
 descriptions_source: live tools/list (authorship probe or saved capture); filled by backfill-tools-from-authorship.py
