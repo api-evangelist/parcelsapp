@@ -1,0 +1,875 @@
+{
+  "endpoint": "https://parcelsapp.com/mcp",
+  "captured": "2026-10-20",
+  "method": "initialize + tools/list (anonymous, no tool called; roadmap#992)",
+  "protocol_version": "2025-06-18",
+  "server_info": {
+    "name": "parcels-shipment-tracking",
+    "version": "0.3.0"
+  },
+  "result": {
+    "tools": [
+      {
+        "name": "track_shipment",
+        "title": "Track a shipment",
+        "description": "Use this when the user provides a tracking number or supported tracking URL and asks to track, locate, check, monitor, or update the status of one package, parcel, shipment, or delivery. This includes questions about where a shipment is, whether it was delivered, or when it may arrive, with or without a named carrier such as UPS, FedEx, DHL, USPS, Royal Mail, or China Post. Parcels detects the carrier and returns cached or live status, events, route, weight, transit time, and available shipment attributes. A carrier may return state requires_input with exact requiredFields such as postal code, house number, phone digits, email, country, date, vessel, or another service-specific value. Ask the user for those values and retry with additional_fields; never guess them. If the carrier must be chosen, first use search_supported_carriers and pass its exact slug. Do not use for bulk monitoring, shipping-label purchases, rate quotes, or delivery changes.",
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "tracking_number": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 200,
+              "description": "Shipment tracking number or supported tracking URL."
+            },
+            "language": {
+              "default": "en",
+              "type": "string",
+              "enum": [
+                "en",
+                "ru",
+                "de",
+                "es",
+                "fr",
+                "it",
+                "nl",
+                "pt",
+                "sv",
+                "id",
+                "ko"
+              ]
+            },
+            "destination_country": {
+              "description": "Destination country as an ISO 3166-1 alpha-2 code such as SE, or a full country name in a supported language.",
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80
+            },
+            "postal_code": {
+              "description": "Destination postal code only when a carrier requires it.",
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 32
+            },
+            "carrier_slug": {
+              "description": "Exact supported carrier slug returned by search_supported_carriers. Omit to use automatic carrier detection.",
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100
+            },
+            "additional_fields": {
+              "description": "Carrier-required values keyed by the exact names returned in requiredFields. Ask the user and pass values unchanged; never invent them.",
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              }
+            }
+          },
+          "required": [
+            "tracking_number"
+          ]
+        },
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "execution": {
+          "taskSupport": "forbidden"
+        },
+        "_meta": {
+          "ui": {
+            "resourceUri": "ui://parcels/tracking-card-v4.html",
+            "visibility": [
+              "model",
+              "app"
+            ]
+          },
+          "openai/outputTemplate": "ui://parcels/tracking-card-v4.html",
+          "openai/widgetAccessible": true,
+          "openai/toolInvocation/invoking": "Checking shipment…",
+          "openai/toolInvocation/invoked": "Shipment checked",
+          "ui/resourceUri": "ui://parcels/tracking-card-v4.html"
+        },
+        "outputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "requires_input",
+                "complete",
+                "error"
+              ]
+            },
+            "stateVersion": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "requestToken": {
+              "type": "string"
+            },
+            "trackingNumber": {
+              "type": "string"
+            },
+            "carrier": {
+              "type": "string"
+            },
+            "carrierSlug": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "statusLabel": {
+              "type": "string"
+            },
+            "estimatedDelivery": {
+              "type": "string"
+            },
+            "service": {
+              "type": "string"
+            },
+            "weight": {
+              "type": "string"
+            },
+            "origin": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "destination": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "destinationCountry": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "daysInTransit": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "attributes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "key",
+                  "label",
+                  "value"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "timestamp": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "string"
+                  },
+                  "carrier": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "lastUpdatedAt": {
+              "type": "string"
+            },
+            "fromCache": {
+              "type": "boolean"
+            },
+            "retryAfterSeconds": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "openUrl": {
+              "type": "string"
+            },
+            "errorCode": {
+              "type": "string"
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "meaning": {
+                  "type": "string"
+                },
+                "recoverable": {
+                  "type": "boolean"
+                },
+                "nextActions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "provide_destination_country",
+                          "select_carrier",
+                          "provide_postal_code",
+                          "retry",
+                          "start_new_tracking"
+                        ]
+                      },
+                      "input": {
+                        "type": "string",
+                        "enum": [
+                          "destination_country",
+                          "carrier_slug",
+                          "postal_code",
+                          "tracking_number"
+                        ]
+                      },
+                      "instruction": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "instruction"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "checkedCountry": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false
+                },
+                "suggestedCarriers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "slug": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "slug",
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "meaning",
+                "recoverable",
+                "nextActions"
+              ],
+              "additionalProperties": false
+            },
+            "requiredFields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "text",
+                      "select"
+                    ]
+                  },
+                  "defaultValue": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "sensitive": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "name",
+                  "label",
+                  "type"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "state",
+            "stateVersion",
+            "requestToken",
+            "trackingNumber",
+            "statusLabel",
+            "attributes",
+            "events",
+            "lastUpdatedAt",
+            "fromCache",
+            "openUrl"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "search_supported_carriers",
+        "title": "Search supported carriers",
+        "description": "Use this when the user asks which couriers Parcels supports, names a courier that must be converted to an exact carrier slug, wants to choose a carrier, or a tracking error asks for carrier selection. Search by carrier name or slug; omit query to list common supported carriers. Return the exact slug to pass to track_shipment as carrier_slug. This tool does not track a shipment.",
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Carrier name or slug to search for. Omit to list common supported carriers.",
+              "type": "string",
+              "maxLength": 100
+            },
+            "language": {
+              "default": "en",
+              "type": "string",
+              "enum": [
+                "en",
+                "ru",
+                "de",
+                "es",
+                "fr",
+                "it",
+                "nl",
+                "pt",
+                "sv",
+                "id",
+                "ko"
+              ]
+            },
+            "limit": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "execution": {
+          "taskSupport": "forbidden"
+        },
+        "_meta": {
+          "ui": {
+            "visibility": [
+              "model",
+              "app"
+            ]
+          },
+          "openai/toolInvocation/invoking": "Searching supported carriers…",
+          "openai/toolInvocation/invoked": "Supported carriers found"
+        },
+        "outputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "carriers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slug",
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "totalMatches": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "hasMore": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "query",
+            "carriers",
+            "totalMatches",
+            "hasMore"
+          ],
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "get_tracking_result",
+        "title": "Get a tracking result",
+        "description": "Use this only as the required continuation after track_shipment returns state pending. Wait for retryAfterSeconds, pass the returned requestToken unchanged as request_token, and keep calling this tool while the result remains pending until it returns complete, requires_input, or error. If requires_input is returned, stop polling, ask the user for requiredFields, and start a new track_shipment call with additional_fields. Do not use it to start a new tracking request.",
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "request_token": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Opaque request token returned by track_shipment."
+            }
+          },
+          "required": [
+            "request_token"
+          ]
+        },
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "execution": {
+          "taskSupport": "forbidden"
+        },
+        "_meta": {
+          "ui": {
+            "resourceUri": "ui://parcels/tracking-card-v4.html",
+            "visibility": [
+              "model",
+              "app"
+            ]
+          },
+          "openai/outputTemplate": "ui://parcels/tracking-card-v4.html",
+          "openai/widgetAccessible": true,
+          "openai/toolInvocation/invoking": "Refreshing tracking…",
+          "openai/toolInvocation/invoked": "Tracking refreshed",
+          "ui/resourceUri": "ui://parcels/tracking-card-v4.html"
+        },
+        "outputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "requires_input",
+                "complete",
+                "error"
+              ]
+            },
+            "stateVersion": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "requestToken": {
+              "type": "string"
+            },
+            "trackingNumber": {
+              "type": "string"
+            },
+            "carrier": {
+              "type": "string"
+            },
+            "carrierSlug": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "statusLabel": {
+              "type": "string"
+            },
+            "estimatedDelivery": {
+              "type": "string"
+            },
+            "service": {
+              "type": "string"
+            },
+            "weight": {
+              "type": "string"
+            },
+            "origin": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "destination": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "destinationCountry": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "daysInTransit": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "attributes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "key",
+                  "label",
+                  "value"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "timestamp": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "string"
+                  },
+                  "carrier": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "lastUpdatedAt": {
+              "type": "string"
+            },
+            "fromCache": {
+              "type": "boolean"
+            },
+            "retryAfterSeconds": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "openUrl": {
+              "type": "string"
+            },
+            "errorCode": {
+              "type": "string"
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "meaning": {
+                  "type": "string"
+                },
+                "recoverable": {
+                  "type": "boolean"
+                },
+                "nextActions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "provide_destination_country",
+                          "select_carrier",
+                          "provide_postal_code",
+                          "retry",
+                          "start_new_tracking"
+                        ]
+                      },
+                      "input": {
+                        "type": "string",
+                        "enum": [
+                          "destination_country",
+                          "carrier_slug",
+                          "postal_code",
+                          "tracking_number"
+                        ]
+                      },
+                      "instruction": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "instruction"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "checkedCountry": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false
+                },
+                "suggestedCarriers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "slug": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "slug",
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "code",
+                "message",
+                "meaning",
+                "recoverable",
+                "nextActions"
+              ],
+              "additionalProperties": false
+            },
+            "requiredFields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "text",
+                      "select"
+                    ]
+                  },
+                  "defaultValue": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "sensitive": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "name",
+                  "label",
+                  "type"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "state",
+            "stateVersion",
+            "requestToken",
+            "trackingNumber",
+            "statusLabel",
+            "attributes",
+            "events",
+            "lastUpdatedAt",
+            "fromCache",
+            "openUrl"
+          ],
+          "additionalProperties": false
+        }
+      }
+    ]
+  }
+}
