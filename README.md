@@ -1,4 +1,4 @@
-# Parcels App (parcelsapp)
+# Parcels App
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -66,81 +66,128 @@
 
 Parcels App (parcelsapp.com) is a universal parcel tracking service that tracks packages, air cargo (AWB), road freight (LTL/FTL), and sea freight across 1,540 postal operators, couriers, and logistics carriers worldwide - USPS, UPS, FedEx, DHL, Royal Mail, China Post, Cainiao, 4PX, and many more. The Parcels API v3 is an asynchronous shipment tracking API - create a tracking request, then poll by UUID or receive webhook callbacks until results are complete - with automatic carrier detection, localized tracking events, and cached results returned immediately.
 
-**Access model:** The API is publicly documented (interactive reference plus a published OpenAPI 3.0.3 contract at `https://parcelsapp.com/api-docs/openapi.json`, including a keyless mock server for trying the flow). Live calls require an API key issued through the Parcels dashboard (`https://parcelsapp.com/dashboard/`), passed as an `apiKey` parameter, on a paid monthly subscription metered by unique tracking numbers per month ($19/$29/$49 published tiers). Parcels App offers a 30-day no-questions-asked refund on paid plans, and its API terms prohibit building a competing tracking website or app with it.
+**Areas:** Parcel Tracking · Shipment Status · Package Tracking · Logistics · Shipping · Carrier
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/parcelsapp/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/parcelsapp/refs/heads/main/apis.yml)
+## Parcels App on APIs.io
 
-## Tags
+Everything profiled for Parcels App is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/parcelsapp/](https://apis.io/providers/parcelsapp/)** — or go straight to one of the APIs or properties below.
 
-- Parcel Tracking
-- Shipment Status
-- Package Tracking
-- Logistics
-- Shipping
-- Carriers
+### APIs (3)
 
-## Timestamps
+- [Parcels App Account API](https://apis.io/apis/parcelsapp/parcelsapp-account-api/) — Subscription usage and account limits
+- [Parcels App Tracking API](https://apis.io/apis/parcelsapp/parcelsapp-tracking-api/) — Create tracking requests and read results
+- [Parcels App Webhooks API](https://apis.io/apis/parcelsapp/parcelsapp-webhooks-api/) — Callbacks sent to your `webhookUrl` when tracking progresses or completes. Pass `webhookUrl` in `POST /shipments/tracking`; Parcels sends JSON `POST`…
 
-- **Created:** 2026-07-11
-- **Modified:** 2026-07-11
+### Published properties
 
-## APIs
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-### Parcels App Shipments Tracking API
+#### MCP servers (1)
 
-Asynchronous multi-carrier shipment tracking. `POST /shipments/tracking` creates a tracking request for one or more tracking numbers (with automatic carrier detection across 1,540 carriers), returning a UUID and any cached results immediately; `GET /shipments/tracking` polls by UUID until `done` is `true`. Optionally pass a `webhookUrl` to receive `shipment_completed` and `batch_completed` JSON callbacks instead of polling. Returns shipment status, origin/destination, detected carrier, and a full timeline of tracking events.
+Model Context Protocol servers that expose the API to agents.
 
-- **Human URL:** [https://parcelsapp.com/api-docs/](https://parcelsapp.com/api-docs/)
-- **Base URL:** `https://parcelsapp.com/api/v3`
+- [parcelsapp](https://apis.io/servers/parcelsapp/parcelsapp/)
 
-#### Tags
+#### Agentic access (1)
 
-- Parcel Tracking
-- Shipment Status
-- Package Tracking
-- Webhooks
+Which operations an agent can call, which act, and which need a human in the loop.
 
-#### Properties
+- [Parcelsapp Agentic Access](https://apis.io/agentic-access/parcelsapp/parcelsapp-agentic-access/)
 
-- [Documentation](https://parcelsapp.com/api-docs/)
-- [API Reference](https://parcelsapp.com/api-docs/openapi.json)
-- [OpenAPI](openapi/parcelsapp-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/parcelsapp.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/parcelsapp.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+#### Collections (4)
 
-### Parcels App Account Usage API
+Postman and Open Collection request collections.
 
-`GET /account` returns the current subscription plan, monthly unique shipment limit, usage counter, and the UTC date the counter resets - letting integrations meter their tracking quota before creating new requests.
+- [Parcels App Tracking API](https://apis.io/collections/parcelsapp/open-parcelsapp/)
+- [Parcels Account API](https://apis.io/collections/parcelsapp/open-parcelsapp-account-api/)
+- [Parcels Account Tracking API](https://apis.io/collections/parcelsapp/open-parcelsapp-tracking-api/)
+- [Parcels Account Webhooks API](https://apis.io/collections/parcelsapp/open-parcelsapp-webhooks-api/)
 
-- **Human URL:** [https://parcelsapp.com/api-docs/](https://parcelsapp.com/api-docs/)
-- **Base URL:** `https://parcelsapp.com/api/v3`
+#### Security (1)
 
-#### Tags
+Authentication, trust centre, and vulnerability disclosure.
 
-- Account
-- Usage
-- Quotas
+- [Parcelsapp Domain Security](https://apis.io/security/parcelsapp/parcelsapp-domain-security/)
 
-#### Properties
+#### Plans and pricing (1)
 
-- [Documentation](https://parcelsapp.com/api-docs/)
-- [OpenAPI](openapi/parcelsapp-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/parcelsapp.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/parcelsapp.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+Published plans, tiers and prices.
 
-## Common Properties
+- [Parcelsapp Plans Pricing](https://apis.io/plans/parcelsapp/parcelsapp-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Parcelsapp Rate Limits](https://apis.io/rate-limits/parcelsapp/parcelsapp-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [Parcelsapp Finops](https://apis.io/finops/parcelsapp/parcelsapp-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://parcelsapp.com)
 - [Documentation](https://parcelsapp.com/api-docs/)
-- [Portal](https://parcelsapp.com/dashboard/)
 - [Pricing](https://parcelsapp.com/pricing-api)
-- [Terms Of Service](https://parcelsapp.com/terms-api)
 - [Blog](https://parcelsapp.com/blog)
-- [Plans](plans/parcelsapp-plans-pricing.yml)
-- [Rate Limits](rate-limits/parcelsapp-rate-limits.yml)
-- [Fin Ops](finops/parcelsapp-finops.yml)
+- [Terms of service](https://parcelsapp.com/terms-api)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** Kin Lane
-**Email:** kin@apievangelist.com
+**Kin Score 28.6** — thin · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 68.3 |
+| Contract quality | 47.1 |
+| Contract governance | 0.0 |
+| Operational transparency | 7.9 |
+| Developer ergonomics | 28.6 |
+| Access clarity | 28.9 |
+
+**Agent readiness 30.5** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | verified |
+| Auth Clarity | — |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | derived (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 8.3** — Telecommunications
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/parcelsapp/](https://apis.io/providers/parcelsapp/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Parcels App: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/parcelsapp/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
